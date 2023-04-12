@@ -5,6 +5,10 @@ Contact me at eosimo at ic.ac.uk
 
 ### Chapter Chapter 3 - Schizophrenia heritability from partitioned PRSs
 
+BASE =   Schizophrenia GWAS xs234 leave-one-out from the Psychiatric Genomic Consortium (PGC) (Trubetskoy et al., 2022).
+TARGET = xs234 Psychiatric Genomic Consortium (PGC) cohort
+
+
 This repository contains the code for work contained in Chapter 3. This is a Nextflow pipeline, in which I develop ‘partitioned’ polygenic risk scores, or PRSs where two
 genomic compartments (e.g., the tissue-specific enhancers and the residual compartments) are
 considered separately for polygenic risk scoring, and then disease heritability is calculated
