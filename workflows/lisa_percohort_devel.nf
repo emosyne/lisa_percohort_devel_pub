@@ -154,7 +154,7 @@ workflow lisa_percohort_devel {
         // ##################################################### GENERATE MODIFIED ORS MULT BY ES OR EXP       ###########################################################
         // output separate lists to calculate split PRSs and also merged one
         PLINK_clump.out.clumped_SNPs_and_noclump_lists.map { [it, "1"].flatten() }, //######################## multiplier can be set here ########################
-        Channel.fromPath( "../private_input_files/lisa_percohort_devel_ES_multipliers/2023-01-18_NEURAL_ENH_EXP_significant_ES_significant_contact_EPs_gene_brain_exp_plus_100_noOverlap.csv.gz", checkIfExists: true)
+        Channel.fromPath( "../private_input_files/ES_multipliers/2023-01-18_NEURAL_ENH_EXP_significant_ES_significant_contact_EPs_gene_brain_exp_plus_100_noOverlap.csv.gz", checkIfExists: true)
     )
 
 
