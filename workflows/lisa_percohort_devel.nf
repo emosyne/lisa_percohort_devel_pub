@@ -15,14 +15,14 @@ include {R_final_plot}                  from '../modules/local/R_final_plot.nf'
 test_sample_list = ["clz2a","xs234","celso"]//"celso""xirwt","xgras","xjrsa","gawli","mcqul","xclm2","xclo3","gpc2a","xboco","xswe5","xswe6",
 LOO_PGC_GWASES = 
     Channel.fromList( test_sample_list )
-    .map{[it, file("/home/osimoe/sumstats_w3/autosomes/PRS/ancestry-specific/study_scores_deduped_eur/training/daner_PGC_SCZ_w3_76_0518d_eur.no${it}.gz")]}
+    .map{[it, file("/gpfs/work5/0/pgcdac/DWFV2CJb8Piv_0116_pgc_data/scz/wave3/summary_stats/autosomes/PRS/ancestry-specific/study_scores_deduped_eur/training/daner_PGC_SCZ_w3_76_0518d_eur.no${it}.gz")]}
    
 
 // LOO_PGC_GWASES.view()
 
 
 no_PCA_sample_list = ["butr","grtr","lemu","uktr"]
-Channel.fromPath( '/home/osimoe/PGC_w3_data/*', type: 'dir' )
+Channel.fromPath( '//gpfs/work5/0/pgcdac/DWFV2CJb8Piv_0116_pgc_data/scz/wave3/v1/*', type: 'dir' )
     .map{ it -> [it.simpleName , it] }
     .branch { sample_name, sample_path ->
         no_PCA: sample_name in no_PCA_sample_list
@@ -43,7 +43,7 @@ enhancer_lists_bed_files =
         "Neural_significant_enh",
         "Neural_significant_enh_GRB",
         // "NEURAL_14k_noGRB_significant_EPs",
-        "Non-neural_enh",
+        "Non-neural_significant_enh",
         // "687_BRAIN_EP_eQTL",
         "Non-associated_enh"
         )
@@ -58,7 +58,7 @@ enhancer_lists_bed_files =
 
 //LD ref
 LD_reference = Channel.from("bed","bim","fam") 
-    .map { ext -> [file("/home/osimoe/project/LD_ref/EUR_phase3_autosomes_hg19.${ext}")] }
+    .map { ext -> [file("/home/osimoe/LD_ref/EUR_phase3_autosomes_hg19.${ext}")] }
             .collect()
 
 
