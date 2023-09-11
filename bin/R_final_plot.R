@@ -79,7 +79,7 @@ threshold = args[31]
 
 #set input variables
 number_quantiles = 3
-condition_name = "SCZ"
+condition_name = "schizophrenia"
 # pop_prev = population prevalence
 pop_prev = 0.01
 
@@ -94,18 +94,16 @@ if (!dir.exists(file.path(paste0(threshold,"")))) {dir.create(file.path(paste0(t
 
 
 
-
-
 #SUMMARY TABLE
 #import thresholds and SNP N for each summary
 (summary_table = 
    rbind(
-     "TS_ENH_GWAS_compartment_originalOR_summary" = 
-       data.frame(fread(TS_ENH_GWAS_compartment_originalOR_summary, select=c("Threshold", "PRS.R2","Num_SNP"))),#"PRS.R2.adj",
-     "TS_ENH_GWAS_compartment_OR_by_measure1_summary" = 
-       data.frame(fread(TS_ENH_GWAS_compartment_OR_by_measure1_summary, select=c("Threshold", "PRS.R2","Num_SNP"))),#"PRS.R2.adj",
-     "TS_ENH_GWAS_compartment_OR_by_measure2_summary" = 
-       data.frame(fread(TS_ENH_GWAS_compartment_OR_by_measure2_summary, select=c("Threshold", "PRS.R2","Num_SNP"))),#"PRS.R2.adj",
+     "EPWAS_originalOR_summary" = 
+       data.frame(fread(EPWAS_originalOR_summary, select=c("Threshold", "PRS.R2","Num_SNP"))),#"PRS.R2.adj",
+     "EPWAS_OR_by_measure1_summary" = 
+       data.frame(fread(EPWAS_OR_by_measure1_summary, select=c("Threshold", "PRS.R2","Num_SNP"))),#"PRS.R2.adj",
+     "EPWAS_OR_by_measure2_summary" = 
+       data.frame(fread(EPWAS_OR_by_measure2_summary, select=c("Threshold", "PRS.R2","Num_SNP"))),#"PRS.R2.adj",
      "residual_GWAS_compartment_summary"=
        data.frame(fread(residual_GWAS_compartment_summary, select=c("Threshold", "PRS.R2","Num_SNP"))),#"PRS.R2.adj",
      "original_GWAS_summary"=
@@ -116,9 +114,9 @@ if (!dir.exists(file.path(paste0(threshold,"")))) {dir.create(file.path(paste0(t
 
 #BEST TABLE
 #create total PRS score
-(BEST_PRS_score_per_UKBB_participant <- TS_ENH_GWAS_compartment_originalOR_best %>%
-    left_join(TS_ENH_GWAS_compartment_OR_by_measure1_best) %>%
-    left_join(TS_ENH_GWAS_compartment_OR_by_measure2_best) %>%
+(BEST_PRS_score_per_UKBB_participant <- EPWAS_originalOR_best %>%
+    left_join(EPWAS_OR_by_measure1_best) %>%
+    left_join(EPWAS_OR_by_measure2_best) %>%
     left_join(residual_GWAS_compartment_best) %>%
     # left_join(merged_GWAS_best) %>%
     left_join(original_GWAS_best) %>%
@@ -138,7 +136,7 @@ scaled_BEST_PRS_score_per_UKBB_participant[,c(2:6)] <-  data.frame(scale(BEST_PR
 (scaled_BEST_PRS_score_per_UKBB_participant<-
     scaled_BEST_PRS_score_per_UKBB_participant %>% 
     # mutate(weight_total_PRS_best = 
-    #          (TS_ENH_GWAS_compartment_originalOR_best_PRS * summary_table[summary_table$compartment=="TS_ENH_GWAS_compartment_originalOR_summary",]$Num_SNP  /summary_table[summary_table$compartment=="merged_GWAS_summary",]$Num_SNP) + 
+    #          (EPWAS_originalOR_best_PRS * summary_table[summary_table$compartment=="EPWAS_originalOR_summary",]$Num_SNP  /summary_table[summary_table$compartment=="merged_GWAS_summary",]$Num_SNP) + 
     #          (residual_GWAS_compartment_best_PRS     * summary_table[summary_table$compartment=="residual_GWAS_compartment_summary",]$Num_SNP      /summary_table[summary_table$compartment=="merged_GWAS_summary",]$Num_SNP)) %>%
     remove_missing() %>% 
     #generate quantiles
@@ -149,13 +147,13 @@ scaled_BEST_PRS_score_per_UKBB_participant[,c(2:6)] <-  data.frame(scale(BEST_PR
     mutate(residual_GWAS_compartment_q = 
              factor(ntile(residual_GWAS_compartment_best_PRS, n = number_quantiles))) %>% 
     mutate(TS_ENH_compartment_originalOR_q = 
-             factor(ntile(TS_ENH_GWAS_compartment_originalOR_best_PRS, number_quantiles))) %>% 
+             factor(ntile(EPWAS_originalOR_best_PRS, number_quantiles))) %>% 
     # mutate(weight_total_q = 
     #          factor(ntile(weight_total_PRS_best, number_quantiles)))%>% 
     mutate(TS_ENH_compartment_OR_by_measure1_q = 
-             factor(ntile(TS_ENH_GWAS_compartment_OR_by_measure1_best_PRS, number_quantiles)))%>% 
+             factor(ntile(EPWAS_OR_by_measure1_best_PRS, number_quantiles)))%>% 
     mutate(TS_ENH_compartment_OR_by_measure2_q = 
-             factor(ntile(TS_ENH_GWAS_compartment_OR_by_measure2_best_PRS, number_quantiles)))
+             factor(ntile(EPWAS_OR_by_measure2_best_PRS, number_quantiles)))
 )
 
 
@@ -167,7 +165,7 @@ scaled_BEST_PRS_score_per_UKBB_participant[,c(2:6)] <-  data.frame(scale(BEST_PR
 
 
 #Write output to file
-sink(paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_logfile.log"))
+sink(paste0(OUTPUT_prefix, cohort_ENHlist_thresh, "_", Sys.Date(),"_logfile.log"), split = T)
 print("measures of model fit:")
 #### measures of model fit 
 ## https://onlinelibrary.wiley.com/doi/full/10.1002/gepi.21614
@@ -185,38 +183,50 @@ print("measures of model fit:")
 (mv = zv/pop_prev) #mean liability for case
 (mv2 = -mv*pop_prev/(1-pop_prev)) #mean liability for controls
 
-#R2 on the observed scale
-(theta = mv*(case_prev_in_sample-pop_prev)/(1-pop_prev)*(mv*(case_prev_in_sample-pop_prev)/(1-pop_prev)-thd)) #θ in equation 15
-(cv = pop_prev*(1-pop_prev)/zv^2*pop_prev*(1-pop_prev)/(case_prev_in_sample*(1-case_prev_in_sample))) #C inequation 15
+# #R2 on the observed scale
+# (theta = mv*(case_prev_in_sample-pop_prev)/(1-pop_prev)*(mv*(case_prev_in_sample-pop_prev)/(1-pop_prev)-thd)) #θ in equation 15
+# # theta = mv * (P - K)/(1 - K) * (mv * (P - K)/(1 - K) - thd)
+# (cv = pop_prev*(1-pop_prev)/zv^2*pop_prev*(1-pop_prev)/(case_prev_in_sample*(1-case_prev_in_sample))) #C inequation 15
+# # cv = K * (1 - K)/zv^2 * K * (1 - K)/(P * (1 - P))
+# #Choi
+# (e = 1 - (case_prev_in_sample^(2 * case_prev_in_sample)) * ((1 - case_prev_in_sample)^(2 * (1 - case_prev_in_sample))))
+# (top = cv * e)
+# (bottom = cv * e * theta)
+# ChoiMe <- function(x,...){
+#   top * x / (1 + bottom * x)
+# }
 
-#Choi
-(e = 1 - (case_prev_in_sample^(2 * case_prev_in_sample)) * ((1 - case_prev_in_sample)^(2 * (1 - case_prev_in_sample))))
-(top = cv * e)
-(bottom = cv * e * theta)
-ChoiMe <- function(x,...){
-  top * x / (1 + bottom * x)
-}
+
 
 # Start writing to an output file
 (CoD_per_SNP = data.frame())
 
-
+scaled_BEST_PRS_score_per_UKBB_participant$dx <- ifelse(scaled_BEST_PRS_score_per_UKBB_participant$dx=="1", 0, 1)
 
 # ## original_GWAS
-#logistic model
-logit = glm(dx ~ original_GWAS_best_PRS, data = scaled_BEST_PRS_score_per_UKBB_participant,family = binomial(logit))
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ original_GWAS_best_PRS, data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(paper_formula = R2O*cv/(1+R2O*theta*cv))
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-(original_GWAS_logistic_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                         cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi")))
+##bootstrap to obtain R2 variance
+(logit = rms::lrm(factor(dx) ~ original_GWAS_best_PRS, scaled_BEST_PRS_score_per_UKBB_participant)$stats[10])
+
+linear = lm(dx ~ original_GWAS_best_PRS, data = scaled_BEST_PRS_score_per_UKBB_participant)
+summary(linear)[[8]]
+
+(boot_lm <- boot(
+  scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+    summary(lm(dx ~ original_GWAS_best_PRS, data[indices,]))[[8]], 
+  R=500, ncpus = nthreads
+)
+)
+(linear_R2       = boot_lm$t0)
+(linear_R2_SE    = sd(boot_lm$t))
+(linear_R2_95CI  = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="0",    
                NSNP=summary_table[summary_table$compartment=="original_GWAS_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
@@ -225,28 +235,87 @@ linear = lm(as.numeric(as.character(dx)) ~ original_GWAS_best_PRS, data = scaled
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,original_GWAS_logistic_model_R2)
+  cbind(info,results_table)
+))
+
+
+
+# ## original_GWAS + squared original GWAS
+# A more streamlined approach can be adopted by consolidating the various predictors (any_cov1, any_cov2, …, any_covN) into a single predictor, following this procedure in R: 
+#   
+#   R 
+# mod <- lm(y ~PRS + any_cov1 + any_cov2 + … + any_covN) 
+# merged_predictor <- cbind(any_cov1, any_cov2, … , any_covN) %*% mod$coefficients[3:(2+N)] 
+#logistic model
+linear = lm(dx ~ original_GWAS_best_PRS +
+              I(original_GWAS_best_PRS^2), data = scaled_BEST_PRS_score_per_UKBB_participant)
+summary(linear)[[8]]
+
+merged_predictor_original_plus_squared_original <- 
+  cbind(
+    scaled_BEST_PRS_score_per_UKBB_participant$original_GWAS_best_PRS, 
+    I(scaled_BEST_PRS_score_per_UKBB_participant$original_GWAS_best_PRS^2)) %*% 
+  linear$coefficients[2:(3)] 
+
+summary(
+  lm(scaled_BEST_PRS_score_per_UKBB_participant$dx ~ merged_predictor_original_plus_squared_original)
+)[[8]]
+
+(boot_lm <- 
+    boot(
+      scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+        summary(lm(dx ~ original_GWAS_best_PRS +
+                     I(original_GWAS_best_PRS^2), data[indices,]))[[8]], 
+      R=500, ncpus = nthreads
+    )
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
+(info = tibble(comp="0b",    
+               NSNP=summary_table[summary_table$compartment=="original_GWAS_summary",]$Num_SNP, 
+               CoD_per_SNP=NA) %>% 
+    #double row
+    slice(rep(1:n(), each = 2)))
+## add to df
+(CoD_per_SNP = rbind(
+  CoD_per_SNP,
+  cbind(info,results_table)
 ))
 
 
 
 
+
 ##residual
-#logistic model
-logit = glm(dx ~ residual_GWAS_compartment_best_PRS, data = scaled_BEST_PRS_score_per_UKBB_participant, family = binomial(logit))
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ residual_GWAS_compartment_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-(paper_formula = R2O*cv/(1+R2O*theta*cv))
-residual_GWAS_compart_logistic_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                                cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi"))
+##bootstrap to obtain R2 variance
+(boot_lm <- boot(
+  scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+    summary(lm(dx ~ residual_GWAS_compartment_best_PRS , data[indices,]))[[8]], 
+  R=500, ncpus = nthreads
+)
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="1",    
                NSNP=summary_table[summary_table$compartment=="residual_GWAS_compartment_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
@@ -255,114 +324,142 @@ residual_GWAS_compart_logistic_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseud
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,residual_GWAS_compart_logistic_model_R2)
+  cbind(info,results_table)
 ))
+
+
 
 # TS ENH original OR
-#logistic model
-logit = glm(dx ~ TS_ENH_GWAS_compartment_originalOR_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant, family = binomial(logit))
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ TS_ENH_GWAS_compartment_originalOR_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(paper_formula = R2O*cv/(1+R2O*theta*cv))
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-TS_ENH_originalOR_compart_logistic_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                                    cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi"))
+##bootstrap to obtain R2 variance
+(boot_lm <- boot(
+  scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+    summary(lm(dx ~ EPWAS_originalOR_best_PRS, data[indices,]))[[8]], 
+  R=500, ncpus = nthreads
+)
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="2",    
-               NSNP=summary_table[summary_table$compartment=="TS_ENH_GWAS_compartment_originalOR_summary",]$Num_SNP, 
+               NSNP=summary_table[summary_table$compartment=="EPWAS_originalOR_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
     #double row
     slice(rep(1:n(), each = 2)))
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,TS_ENH_originalOR_compart_logistic_model_R2)
+  cbind(info,results_table)
 ))
 
+
+
 # TS ENH  OR by measure 1
-#logistic model
-logit = glm(dx ~ TS_ENH_GWAS_compartment_OR_by_measure1_best_PRS, 
-             data = scaled_BEST_PRS_score_per_UKBB_participant, family = binomial(logit))
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ TS_ENH_GWAS_compartment_OR_by_measure1_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-(paper_formula = R2O*cv/(1+R2O*theta*cv))
-TS_ENH_OR_by_measure1_compart_logistic_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                                        cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi"))
+##bootstrap to obtain R2 variance
+(boot_lm <- boot(
+  scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+    summary(lm(dx ~ EPWAS_OR_by_measure1_best_PRS, data[indices,]))[[8]], 
+  R=500, ncpus = nthreads
+)
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="2b",    
-               NSNP=summary_table[summary_table$compartment=="TS_ENH_GWAS_compartment_OR_by_measure1_summary",]$Num_SNP, 
+               NSNP=summary_table[summary_table$compartment=="EPWAS_OR_by_measure1_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
     #double row
     slice(rep(1:n(), each = 2)))
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,TS_ENH_OR_by_measure1_compart_logistic_model_R2)
+  cbind(info,results_table)
 ))
 
 # TS ENH  OR by measure 2
-#logistic model
-logit = glm(dx ~ TS_ENH_GWAS_compartment_OR_by_measure2_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant, family = binomial(logit))
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ TS_ENH_GWAS_compartment_OR_by_measure2_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-(paper_formula = R2O*cv/(1+R2O*theta*cv))
-TS_ENH_OR_by_measure2_compart_logistic_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                                        cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi"))
+##bootstrap to obtain R2 variance
+(boot_lm <- boot(
+  scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+    summary(lm(dx ~ EPWAS_OR_by_measure2_best_PRS, data[indices,]))[[8]], 
+  R=500, ncpus = nthreads
+)
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="2c",    
-               NSNP=summary_table[summary_table$compartment=="TS_ENH_GWAS_compartment_OR_by_measure2_summary",]$Num_SNP, 
+               NSNP=summary_table[summary_table$compartment=="EPWAS_OR_by_measure2_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
     #double row
     slice(rep(1:n(), each = 2)))
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,TS_ENH_OR_by_measure2_compart_logistic_model_R2)
+  cbind(info,results_table)
 ))
 
 
 
 ##simple additive model
-#logistic model
-logit = glm(dx ~ residual_GWAS_compartment_best_PRS + TS_ENH_GWAS_compartment_originalOR_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant, family = binomial(logit)) 
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ residual_GWAS_compartment_best_PRS + TS_ENH_GWAS_compartment_originalOR_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-(paper_formula  = R2O*cv/(1+R2O*theta*cv))
-residual_GWAS_plus_TS_ENH_originalOR_logistic_model_R2 =  rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                                                cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi"))
+linear = lm(dx ~ residual_GWAS_compartment_best_PRS + EPWAS_originalOR_best_PRS, data = scaled_BEST_PRS_score_per_UKBB_participant)
+summary(linear)[[8]]
+
+merged_predictor_residual_plus_EPWAS_originalOR <- 
+  cbind(
+    scaled_BEST_PRS_score_per_UKBB_participant$residual_GWAS_compartment_best_PRS, 
+    scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS) %*% 
+  linear$coefficients[2:(3)] 
+summary(
+  lm(scaled_BEST_PRS_score_per_UKBB_participant$dx ~ merged_predictor_residual_plus_EPWAS_originalOR)
+)[[8]]
+
+##bootstrap to obtain R2 variance
+(boot_lm <- boot(
+  scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+    summary(lm(dx ~ residual_GWAS_compartment_best_PRS + EPWAS_originalOR_best_PRS, data[indices,]))[[8]], 
+  R=500, ncpus = nthreads
+)
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="3",    
-               NSNP=summary_table[summary_table$compartment=="TS_ENH_GWAS_compartment_OR_by_measure2_summary",]$Num_SNP +
+               NSNP=summary_table[summary_table$compartment=="EPWAS_OR_by_measure2_summary",]$Num_SNP +
                  summary_table[summary_table$compartment=="residual_GWAS_compartment_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
     #double row
@@ -370,28 +467,46 @@ residual_GWAS_plus_TS_ENH_originalOR_logistic_model_R2 =  rbind(cbind(psychometr
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,residual_GWAS_plus_TS_ENH_originalOR_logistic_model_R2)
+  cbind(info,results_table)
 ))
+
+
 
 ## full factorial design 
-#logistic model
-logit = glm(dx ~ residual_GWAS_compartment_best_PRS*TS_ENH_GWAS_compartment_originalOR_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant, family = binomial(logit))
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ residual_GWAS_compartment_best_PRS*TS_ENH_GWAS_compartment_originalOR_best_PRS, 
-            data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-(paper_formula  = R2O*cv/(1+R2O*theta*cv))
-logistic_full_factorial_design_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                                cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi"))
+linear = lm(dx ~ residual_GWAS_compartment_best_PRS * EPWAS_originalOR_best_PRS, data = scaled_BEST_PRS_score_per_UKBB_participant)
+summary(linear)[[8]]
+
+merged_predictor_residual_plus_EPWAS_originalOR_interactions <- 
+  cbind(
+    scaled_BEST_PRS_score_per_UKBB_participant$residual_GWAS_compartment_best_PRS, 
+    scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS,
+    scaled_BEST_PRS_score_per_UKBB_participant$residual_GWAS_compartment_best_PRS*scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS) %*% 
+  linear$coefficients[2:4] 
+summary(
+  lm(scaled_BEST_PRS_score_per_UKBB_participant$dx ~ merged_predictor_residual_plus_EPWAS_originalOR_interactions)
+)[[8]]
+
+##bootstrap to obtain R2 variance
+(boot_lm <- boot(
+  scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+    summary(lm(dx ~ residual_GWAS_compartment_best_PRS * EPWAS_originalOR_best_PRS, data[indices,]))[[8]], 
+  R=500, ncpus = nthreads
+)
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="3b",    
-               NSNP=summary_table[summary_table$compartment=="TS_ENH_GWAS_compartment_OR_by_measure2_summary",]$Num_SNP +
+               NSNP=summary_table[summary_table$compartment=="EPWAS_OR_by_measure2_summary",]$Num_SNP +
                  summary_table[summary_table$compartment=="residual_GWAS_compartment_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
     #double row
@@ -399,29 +514,52 @@ logistic_full_factorial_design_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseud
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,logistic_full_factorial_design_model_R2)
+  cbind(info,results_table)
 ))
+
+
 
 # full factorial design including interactions and non-linear interactions
-logit = glm(dx ~ residual_GWAS_compartment_best_PRS*TS_ENH_GWAS_compartment_originalOR_best_PRS +
-              I(residual_GWAS_compartment_best_PRS^2) + I(TS_ENH_GWAS_compartment_originalOR_best_PRS^2), 
-            data = scaled_BEST_PRS_score_per_UKBB_participant, family = binomial(logit))
-summary(logit)
-(pseudo_R2 = as.numeric(fmsb::NagelkerkeR2(logit)[2]))
-## linear model
-linear = lm(as.numeric(as.character(dx)) ~ residual_GWAS_compartment_best_PRS*TS_ENH_GWAS_compartment_originalOR_best_PRS +
-              I(residual_GWAS_compartment_best_PRS^2) + I(TS_ENH_GWAS_compartment_originalOR_best_PRS^2), 
+linear = lm(dx ~ residual_GWAS_compartment_best_PRS*EPWAS_originalOR_best_PRS +
+              I(residual_GWAS_compartment_best_PRS^2) + I(EPWAS_originalOR_best_PRS^2), 
             data = scaled_BEST_PRS_score_per_UKBB_participant)
-#summary(linear)
-# R2 on the liability scale using the transformation
-(R2O = var(linear$fitted.values)/(ncase/nt*ncont/nt))
-#R2 on the observed scale
-(paper_formula  = R2O*cv/(1+R2O*theta*cv))
-(ChoiR2 = top * pseudo_R2 / (1 + bottom * pseudo_R2))
-logistic_full_factorial_design_nonlinear_interactions_model_R2 = rbind(cbind(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)],t="Nagelkerke"),
-                                                                       cbind(ChoiMe(psychometric::CI.Rsq(pseudo_R2,length(logit$fitted.values),1)[c(1,3,4)]),t="Choi"))
+summary(linear)[[8]]
+
+merged_predictor_residual_plus_EPWAS_originalOR_interactions_quadraticterms <- 
+  cbind(
+    scaled_BEST_PRS_score_per_UKBB_participant$residual_GWAS_compartment_best_PRS, 
+    scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS,
+    I(scaled_BEST_PRS_score_per_UKBB_participant$residual_GWAS_compartment_best_PRS^2),
+    I(scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS^2),
+    scaled_BEST_PRS_score_per_UKBB_participant$residual_GWAS_compartment_best_PRS*scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS) %*% 
+  linear$coefficients[2:6] 
+summary(
+  lm(scaled_BEST_PRS_score_per_UKBB_participant$dx ~ merged_predictor_residual_plus_EPWAS_originalOR_interactions_quadraticterms)
+)[[8]]
+
+##bootstrap to obtain R2 variance
+(boot_lm <- 
+    boot(
+      scaled_BEST_PRS_score_per_UKBB_participant,  function(data,indices)
+        summary(lm(dx ~ residual_GWAS_compartment_best_PRS*EPWAS_originalOR_best_PRS +
+                     I(residual_GWAS_compartment_best_PRS^2) + I(EPWAS_originalOR_best_PRS^2), 
+                   data[indices,]))[[8]],
+      R=500, ncpus = nthreads
+    )
+)
+(linear_R2     = boot_lm$t0)
+(linear_R2_SE  = sd(boot_lm$t))
+(CI_95         = data.frame(t(matrix(quantile(boot_lm$t,c(0.025,0.975)))) ))
+
+(R2_liability    = data.frame(r2redux::cc_trf(R2 = linear_R2, se = linear_R2_SE, K = pop_prev, P = case_prev_in_sample)))
+#A 95% confidence interval (CI) is twice the standard error (also called margin of error) plus or minus the mean.
+(R2_liability_CI = cbind(R2_liability$R2l - 1.96*R2_liability$sel,
+                         R2_liability$R2l + 1.96*R2_liability$sel))
+(results_table = rbind(setNames(cbind(linear_R2,linear_R2_95CI, t="r2"), nm = c("R2","R2_LCI","R2_UCI","t")),
+                       setNames(data.frame(cbind(R2_liability$R2l, R2_liability_CI,t="Lee")), nm = c("R2","R2_LCI","R2_UCI","t")))
+)
 (info = tibble(comp="3c",    
-               NSNP=summary_table[summary_table$compartment=="TS_ENH_GWAS_compartment_OR_by_measure2_summary",]$Num_SNP +
+               NSNP=summary_table[summary_table$compartment=="EPWAS_OR_by_measure2_summary",]$Num_SNP +
                  summary_table[summary_table$compartment=="residual_GWAS_compartment_summary",]$Num_SNP, 
                CoD_per_SNP=NA) %>% 
     #double row
@@ -429,15 +567,165 @@ logistic_full_factorial_design_nonlinear_interactions_model_R2 = rbind(cbind(psy
 ## add to df
 (CoD_per_SNP = rbind(
   CoD_per_SNP,
-  cbind(info,logistic_full_factorial_design_nonlinear_interactions_model_R2)
+  cbind(info,results_table)
 ))
 
-# CoD PER SNP df
+# CoD PER SNP df ########
 
 colnames(CoD_per_SNP)=c("partition","Num_SNP","CoD_per_SNP","R2","LCL","UCL","R2type")
 CoD_per_SNP[c(2:6)]<-sapply(CoD_per_SNP[c(2:6)],as.numeric)
 CoD_per_SNP$CoD_per_SNP = (CoD_per_SNP$R2 / CoD_per_SNP$Num_SNP)*10^7
-CoD_per_SNP
+(CoD_per_SNP = as_tibble(CoD_per_SNP))
+
+
+
+
+
+######### Paiwise comparisons with r2redux: ##########
+comparisons <- data.frame(matrix(ncol = 6, nrow = 0))
+#original vs original_plus_squared_original
+compar_1=cbind(
+  scaled_BEST_PRS_score_per_UKBB_participant$dx,
+  scaled_BEST_PRS_score_per_UKBB_participant$original_GWAS_best_PRS,
+  merged_predictor_original_plus_squared_original
+)
+(res_2 = r2redux::r2_diff(dat = compar_1, v1=c(2), v2=c(1), nv=nrow(compar_1)))
+comparisons = rbind(
+  comparisons,
+  cbind(
+    "original vs original_plus_squared_original",
+    r2redux::cc_trf(R2 = res_2$mean_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$lower_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$upper_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    res_2$r2_based_p,
+    res_2$var_diff
+  )
+)
+comparisons
+# original vs residual+EP
+compar_2=cbind(
+  scaled_BEST_PRS_score_per_UKBB_participant$dx,
+  scaled_BEST_PRS_score_per_UKBB_participant$original_GWAS_best_PRS,
+  merged_predictor_residual_plus_EPWAS_originalOR
+)
+(res_2 = r2redux::r2_diff(dat = compar_2, v1=c(2), v2=c(1), nv=nrow(compar_2)))
+comparisons = rbind(
+  comparisons,
+  cbind(
+    "original vs residual + EP",
+    r2redux::cc_trf(R2 = res_2$mean_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$lower_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$upper_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    res_2$r2_based_p,
+    res_2$var_diff
+  )
+)
+# original vs residual+EP + residualxEP
+compar_3=cbind(
+  scaled_BEST_PRS_score_per_UKBB_participant$dx,
+  scaled_BEST_PRS_score_per_UKBB_participant$original_GWAS_best_PRS,
+  merged_predictor_residual_plus_EPWAS_originalOR_interactions
+)
+(res_2 = r2redux::r2_diff(dat = compar_3, v1=c(2), v2=c(1), nv=nrow(compar_3)))
+comparisons = rbind(
+  comparisons,
+  cbind(
+    "original vs residual + EP+ residualxEP",
+    r2redux::cc_trf(R2 = res_2$mean_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$lower_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$upper_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    res_2$r2_based_p,
+    res_2$var_diff
+  )
+)
+# original vs residual+EP + interactions+quadraticterms
+compar_4=cbind(
+  scaled_BEST_PRS_score_per_UKBB_participant$dx,
+  scaled_BEST_PRS_score_per_UKBB_participant$original_GWAS_best_PRS,
+  merged_predictor_residual_plus_EPWAS_originalOR_interactions_quadraticterms
+)
+(res_2 = r2redux::r2_diff(dat = compar_4, v1=c(2), v2=c(1), nv=nrow(compar_4)))
+comparisons = rbind(
+  comparisons,
+  cbind(
+    "original vs residual+EP + interactions+quadraticterms",
+    r2redux::cc_trf(R2 = res_2$mean_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$lower_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$upper_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    res_2$r2_based_p,
+    res_2$var_diff
+  )
+)
+# original_plus_squared_original vs residual+EP + interactions+quadraticterms
+compar_5=cbind(
+  scaled_BEST_PRS_score_per_UKBB_participant$dx,
+  merged_predictor_original_plus_squared_original,
+  merged_predictor_residual_plus_EPWAS_originalOR_interactions_quadraticterms
+)
+(res_2 = r2redux::r2_diff(dat = compar_5, v1=c(2), v2=c(1), nv=nrow(compar_5)))
+comparisons = rbind(
+  comparisons,
+  cbind(
+    "original_plus_squared_original vs residual+EP + interactions+quadraticterms",
+    r2redux::cc_trf(R2 = res_2$mean_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$lower_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$upper_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    res_2$r2_based_p,
+    res_2$var_diff
+  )
+)
+comparisons
+# original enhancer partition vs ES x OR enhancer partition
+compar_6=cbind(
+  scaled_BEST_PRS_score_per_UKBB_participant$dx,
+  scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS,
+  scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_OR_by_measure1_best_PRS
+)
+(res_2 = r2redux::r2_diff(dat = compar_6, v1=c(2), v2=c(1), nv=nrow(compar_6)))
+comparisons = rbind(
+  comparisons,
+  cbind(
+    "original enhancer partition vs ES x OR enhancer partition",
+    r2redux::cc_trf(R2 = res_2$mean_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$lower_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$upper_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    res_2$r2_based_p,
+    res_2$var_diff
+  )
+)
+comparisons
+# original enhancer partition vs TS tpm x OR enhancer partition
+compar_7=cbind(
+  scaled_BEST_PRS_score_per_UKBB_participant$dx,
+  scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_originalOR_best_PRS,
+  scaled_BEST_PRS_score_per_UKBB_participant$EPWAS_OR_by_measure2_best_PRS
+)
+(res_2 = r2redux::r2_diff(dat = compar_7, v1=c(2), v2=c(1), nv=nrow(compar_7)))
+comparisons = rbind(
+  comparisons,
+  cbind(
+    "original enhancer partition vs TS tpm x OR enhancer partition",
+    r2redux::cc_trf(R2 = res_2$mean_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$lower_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    r2redux::cc_trf(R2 = res_2$upper_diff, se = res_2$var_diff, K = pop_prev, P = case_prev_in_sample)$R2l,
+    res_2$r2_based_p,
+    res_2$var_diff
+  )
+)
+comparisons
+
+
+colnames(comparisons) <- c("comparison","mean_diff","lower_diff","upper_diff","r2_based_p","var_diff")
+comparisons[c(2:6)] <-  sapply(comparisons[c(2:6)], as.numeric)
+comparisons
+knitr::kable(comparisons, format = "latex", 
+             caption = paste0("r2redux r2diff comparisons between variables for ",cohort_ENHlist_thresh, " ", Sys.Date()), 
+             digits = 6)
+comparisons[,sapply(comparisons, is.numeric)] <-round(comparisons[,sapply(comparisons, is.numeric)],3)
+
+# r2redux::cc_trf(R2 = res_2$upper_diff, se =  res_2$var_diff, K = pop_prev, P = case_prev_in_sample)
+
+
 
 addline_format <- function(x,...){
   gsub('_',' ',x)
@@ -445,24 +733,35 @@ addline_format <- function(x,...){
 
 #create DF for plotting
 (df_plot<- data.frame(
-  partition=c(factor(c("0","1","2","2b","2c","3","3b","3c"), ordered = T)),
-  partition_name= factor(x = c("0","1","2","2b","2c","3","3b","3c"), labels = c("Original GWAS PRS",
-                                                                                "Residual partition PRS", 
-                                                                                paste0(ENH_list," partition PRS Original OR"),
-                                                                                paste0(ENH_list," partition PRS OR \u00D7 ",modif_name_1),
-                                                                                paste0(ENH_list," partition PRS OR \u00D7 ",modif_name_2),
-                                                                                paste0("Residual + ",ENH_list," partition PRS"),
-                                                                                paste0("Residual \u00D7 ",ENH_list," partition PRS"),
-                                                                                paste0("Residual \u00D7 ",ENH_list," partition PRS + quadratic terms")), ordered = T)
+  partition=c(factor(        c("0","0b","1","2","2b","2c","3","3b","3c"#,"3d"
+  ), ordered = T)),
+  partition_name= factor(x = c("0","0b","1","2","2b","2c","3","3b","3c"#,"3d"
+  ), labels = c("Original GWAS PRS",
+                "Original GWAS + quadratic Original PRS",
+                "Residual partition PRS", 
+                paste0(ENH_list," partition PRS Original OR"),
+                paste0(ENH_list," partition PRS OR \u00D7 ",modif_name_1),
+                paste0(ENH_list," partition PRS OR \u00D7 ",modif_name_2),
+                paste0("Residual + ",ENH_list," partition PRS"),
+                paste0("Residual \u00D7 ",ENH_list," partition PRS"),
+                paste0("Residual \u00D7 ",ENH_list," partition PRS + quadratic terms")
+                #paste0("Residual \u00D7 ",EnhSNP_to_residual_SNP_ratio[1],ENH_list," partition PRS + quadratic terms")
+  ), 
+  ordered = T)
 ) %>% 
     left_join(CoD_per_SNP, by="partition", multiple = "all") %>% 
     mutate(xlabel=factor(stringr::str_wrap(paste0(addline_format(partition_name), " (SNP N=", Num_SNP,")"),
-                                           width=30)))
+                                           width=30))) %>% 
+    #remove Nagel
+    dplyr::filter(R2type=="Lee")
   
 )
+
+knitr::kable(df_plot, format = "latex", caption = "df_plot")
+
 sink()
 
-## FIGURE 1, COD AND COD PER SNP FOR ORIGINAL, ENHANCER AND RESIDUAL PARTITIONS
+## FIGURE 1, COD AND COD PER SNP FOR ORIGINAL, ENHANCER AND RESIDUAL PARTITIONS ###
 # pos <- position_jitter(width = 0, height = 0.1, seed = 2345)
 # pos = position_dodge(width = 0.5)
 pos = position_identity()
@@ -479,11 +778,11 @@ pos = position_identity()
     #                aes(xmin = 0, xmax=R2*100 )) +
     scale_color_manual(values=MetBrewer::met.brewer("Johnson", 2),
                        name = expression(paste(R^2)))+ #labels=c(a=expression(paste(Delta^2))
-    ggrepel::geom_label_repel(position = pos, size = rel(4),  show.legend = F,min.segment.length = 0,
+    ggrepel::geom_label_repel(nudge_y = 0.1, nudge_x = 0.1, size = rel(4),  show.legend = F,min.segment.length = 0,
                               point.padding = NA, box.padding = 0.5)+ #nudge_y = -0.2, 
     scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .15))) + 
     scale_y_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
-    xlab("") +  ylab(paste0(condition_name," diagnosis ~"))+
+    xlab("") +  ylab("HCM diagnosis ~")+
     theme_bw() +
     theme(
       legend.position = "none",  
@@ -507,8 +806,8 @@ pos = position_identity()
 
 
 (p2 <-ggplot(data = df_plot[df_plot$partition == "0" |
-                               df_plot$partition == "1" |
-                               df_plot$partition == "2",], 
+                              df_plot$partition == "1" |
+                              df_plot$partition == "2",], 
              aes(
                y=reorder(xlabel, desc(partition)),
                x=CoD_per_SNP, xmax=CoD_per_SNP, xmin=0,
@@ -519,8 +818,8 @@ pos = position_identity()
     scale_color_manual(values=MetBrewer::met.brewer("Johnson", 2),
                        name = expression(paste(R^2)))+
     ggrepel::geom_label_repel(position = pos, size = rel(4),  show.legend = F,min.segment.length = 0,
-                               point.padding = NA, box.padding = 0.5)+
-    scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .1))) + 
+                              point.padding = NA, box.padding = 0.5)+
+    scale_x_continuous(limits = c(0, max_cod_per_snp), expand = expansion(mult = c(0, .1))) + 
     scale_y_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
     xlab("") +  ylab("")+
     theme_bw() +
@@ -545,45 +844,80 @@ pos = position_identity()
 
 
 fig1grob<- arrangeGrob(
-    textGrob(paste("Coefficients of determination for the main three partitions: original, enhancer and residual"), 
-             gp = gpar(fontsize = 22, fontface = "bold", col="darkgreen")), 
-    f1, f2, 
-    layout_matrix=rbind(c(1,1),
-                        c(2,3)),
-    widths = c(1, 0.5), heights = c(0.1,1)
-  )
+  textGrob(paste("Coefficients of determination for the main three partitions: original, enhancer and residual"), 
+           gp = gpar(fontsize = 22, fontface = "bold", col="darkgreen")), 
+  f1, f2, 
+  layout_matrix=rbind(c(1,1),
+                      c(2,3)),
+  widths = c(1, 0.5), heights = c(0.1,1)
+)
 
 ggsave(
-  filename = paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_CoD_main_partitions.pdf"), 
+  filename = paste0(OUTPUT_prefix, "fig1_", cohort_ENHlist_thresh, "_", Sys.Date(),"_CoD_main_partitions.pdf"), 
   fig1grob,  
   width = 17, height = 5)
 
 
-## FIGURE 2, COD FOR ENH PARTITIONS
 
-(fig2 <- ggplot(data = df_plot[grepl(pattern = "^2", perl = T, x=df_plot$partition) ,], 
-              aes(
-                y=reorder(xlabel, desc(partition)), 
-                x=R2*100, xmin = LCL*100, xmax=UCL*100, 
-                colour=R2type,group=R2type,
-                label=round(R2*100,2)
-              )) +  
-    geom_pointrange(position=pos, size=1, lwd=1) + 
-    scale_color_manual(values=MetBrewer::met.brewer("Johnson", 2),
-                       expression(paste(R^2)))+
-    ggrepel::geom_label_repel(position = pos, size = rel(4),  show.legend = F,min.segment.length = 0,
-                               point.padding = NA, box.padding = 0.5)+ #nudge_y = -0.2, 
-    scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .15))) + 
-    scale_y_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
-    xlab("") +  ylab(paste0(condition_name," diagnosis ~"))+theme_bw() +
-    theme(
-      legend.position = "none",  
-      text=element_text(lineheight = 0.8, angle = 0, size = 21, color = "gray8"),
-      # axis.text.y = element_text(lineheight = 0.8, angle = 0, size = rel(2), color = "gray8"),
-      # axis.title.y = element_text(angle = 90, size = rel(2),
-      #                             margin = margin(t = 0, r = 20, b = 0, l = 0), color = "gray8"),
-      # panel.grid.major.y = element_blank()
-    ))
+
+
+### FIGURE 2, COD FOR ENH PARTITIONS ####
+(plot2= df_plot[grepl(pattern = "^2", perl = T, x=df_plot$partition) ,] %>% droplevels())
+(comparisons )
+
+fig2 <-
+  ggplot(data = plot2,
+         aes(
+           x=reorder(xlabel, desc(partition)), 
+           y=R2*100, #xmin = plot2$LCL*100, xmax=plot2$UCL*100, 
+           colour=R2type,group=R2type
+           # label=round(R2*100,2)
+         )) +
+  geom_point(position = position_dodge(width = 0.5), size=3.5) +
+  geom_errorbar(aes(ymin = LCL*100,
+                    ymax = UCL*100),
+                position = position_dodge(width = 0.5),
+                width = 0, linewidth=1) +
+  ## first comparison: original OR ENH partition vs OR * ES
+  geom_bracket(data = plot2,
+               xmin = reorder(plot2$xlabel, desc(plot2$partition))[[1]],
+               xmax = reorder(plot2$xlabel, desc(plot2$partition))[[2]],
+               y.position = max(plot2$UCL*100)*1.1,
+               label =paste0("MD=",comparisons[6,2]*100,", p=",comparisons[6,5]),
+               # tip.length = c(0.02, 0.02),
+               coord.flip = TRUE,
+               # vjust = -1
+  ) +
+  ## second comparison: original OR ENH partition vs OR * tpm
+  geom_bracket(data = plot2,
+               xmin = reorder(plot2$xlabel, desc(plot2$partition))[[1]],
+               xmax = reorder(plot2$xlabel, desc(plot2$partition))[[3]],
+               y.position = max(plot2$UCL*100)*1.2,
+               label = paste0("MD=",comparisons[7,2]*100,", p=",comparisons[7,5]),
+               # tip.length = c(0.02, 0.02),
+               coord.flip = TRUE,
+               # vjust = -1
+  ) +
+  scale_color_manual(values=MetBrewer::met.brewer("Johnson", 2),
+                     expression(paste(R^2)))+
+  ggrepel::geom_label_repel(
+    data = plot2,
+    aes(
+      x=reorder(xlabel, desc(partition)), 
+      y=R2*100,
+      colour=R2type,group=R2type,
+      label=round(R2*100,2)
+    ), nudge_y = 0.1, nudge_x = 0.1, size = 4,  show.legend = F,#min.segment.length = 0.5,
+    point.padding = NA, box.padding = 0.5) +
+  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .15)))  +
+  scale_x_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
+  ylab("") +  xlab(paste0("HCM diagnosis ~"))+theme_bw() +
+  theme(
+    legend.position = "none",  
+    text=element_text(lineheight = 0.8, angle = 0, size = 21, color = "gray8")
+  )+
+  coord_flip()
+
 
 fig2_grob = arrangeGrob(
   textGrob(paste("CoDs % and 95% CIs for the three enhancer partitions:\nOriginal OR, enhanced by ES, enhanced by expression"), gp = gpar(fontsize = 22, fontface = "bold", col="darkblue")), 
@@ -592,39 +926,84 @@ fig2_grob = arrangeGrob(
 )
 
 ggsave(
-  filename = paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_CoD_enh_partitions.pdf"), 
+  filename = paste0(OUTPUT_prefix, "fig2_", cohort_ENHlist_thresh, "_", Sys.Date(),"_CoD_enh_partitions.pdf"), 
   fig2_grob,  
   width = 10, height = 4, device = "pdf", scale = 1.5)
 
 
 
-## FIGURE 3, COD FOR original,  PARTITIONS
+## FIGURE 3, COD FOR original,  PARTITIONS ####
 
 (fig3 <- ggplot(data = df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,], 
-              aes(
-                y=reorder(xlabel, desc(partition)), 
-                x=R2*100, xmin = LCL*100, xmax=UCL*100, 
-                colour=R2type, group=R2type,
-                label=round(R2*100,2))) +  
-    geom_pointrange(position=pos, size=1, lwd=1) + 
-    scale_color_manual(values=MetBrewer::met.brewer("Johnson", 2),
-                       expression(paste(R^2)))+
-    ggrepel::geom_label_repel(position = pos, size = rel(4),  show.legend = F,min.segment.length = 0,
-                               point.padding = NA, box.padding = 0.5)+ 
-    scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .15))) + 
-    scale_y_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
-    xlab("") +  ylab(paste0(condition_name," diagnosis ~"))+
-    theme_bw() +
-    theme(
-      legend.position = "none",  
-      text=element_text(lineheight = 0.8, angle = 0, size = 21, color = "gray8"),
-      # axis.text.y = element_text(lineheight = 0.8, angle = 0, size = rel(2), color = "gray8"),
-      # axis.text.x = element_text(lineheight = 0.8, angle = 0, size = rel(2), color = "gray8"),
-      # axis.title.y = element_text(angle = 90, size = rel(2),
-      #                             margin = margin(t = 0, r = 20, b = 0, l = 0), color = "gray8"),
-      # legend.text= element_text(lineheight = 0.8, angle = 0, size = rel(2), color = "gray8"),
-      # panel.grid.major.y = element_blank()
-    ))
+                aes(
+                  x=reorder(xlabel, desc(partition)), 
+                  y=R2*100, #ymin = LCL*100, xmax=UCL*100, 
+                  colour=R2type, group=R2type,
+                  label=round(R2*100,2))) +  
+   geom_point(position = position_dodge(width = 0.5), size=3.5) +
+   geom_errorbar(aes(ymin = LCL*100,
+                     ymax = UCL*100),
+                 position = position_dodge(width = 0.5),
+                 width = 0, linewidth=1) +
+   scale_color_manual(values=MetBrewer::met.brewer("Johnson", 2),
+                      expression(paste(R^2)))+
+   ggrepel::geom_label_repel(position = pos, size = rel(4),  show.legend = F,min.segment.length = 0,
+                             point.padding = NA, box.padding = 0.5)+ 
+   scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .1))) + 
+   scale_x_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
+   ylab("") +  xlab(paste0("HCM diagnosis ~"))+
+   theme_bw() +
+   theme(
+     legend.position = "none",  
+     text=element_text(lineheight = 0.8, angle = 0, size = 21, color = "gray8")
+   )+
+   ## first comparison: original vs original_plus_squared_original
+   geom_bracket(data = df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,],
+                xmin = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[1]],
+                xmax = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[2]],
+                y.position = max(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$UCL*100)*1.08,
+                label =paste0("MD=",comparisons[comparisons$comparison=="original vs original_plus_squared_original",2]*100,
+                              ", p=",comparisons[comparisons$comparison=="original vs original_plus_squared_original",5]),
+                # tip.length = c(0.02, 0.02),
+                coord.flip = TRUE,
+                # vjust = -1
+   ) +
+   ## second comparison: original vs residual + EP
+   geom_bracket(data = df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,],
+                xmin = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[1]],
+                xmax = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[3]],
+                y.position = max(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$UCL*100)*1.16,
+                label = paste0("MD=",comparisons[comparisons$comparison=="original vs residual + EP",2]*100,
+                               ", p=",comparisons[comparisons$comparison=="original vs residual + EP",5]),
+                # tip.length = c(0.02, 0.02),
+                coord.flip = TRUE,
+                # vjust = -1
+   )+
+   ## third comparison: original vs residual + EP+ residualxEP
+   geom_bracket(data = df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,],
+                xmin = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[1]],
+                xmax = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[4]],
+                y.position = max(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$UCL*100)*1.24,
+                label = paste0("MD=",comparisons[comparisons$comparison=="original vs residual + EP+ residualxEP",2]*100,
+                               ", p=",comparisons[comparisons$comparison=="original vs residual + EP+ residualxEP",5]),
+                # tip.length = c(0.02, 0.02),
+                coord.flip = TRUE,
+                # vjust = -1
+   )+
+   ## third comparison: original_plus_squared_original vs residual+EP + interactions+quadraticterms
+   geom_bracket(data = df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,],
+                xmin = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[2]],
+                xmax = reorder(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$xlabel, desc(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$partition))[[5]],
+                y.position = max(df_plot[grepl(pattern = "^0|^3", perl = T, x=df_plot$partition) ,]$UCL*100)*1.32,
+                label = paste0("MD=",comparisons[comparisons$comparison=="original_plus_squared_original vs residual+EP + interactions+quadraticterms",2]*100,
+                               ", p=",comparisons[comparisons$comparison=="original_plus_squared_original vs residual+EP + interactions+quadraticterms",5]),
+                # tip.length = c(0.02, 0.02),
+                coord.flip = TRUE,
+                # vjust = -1
+   )+
+   coord_flip())
+ 
+ 
 
 fig3_grob= arrangeGrob(
   textGrob(paste("CoDs % and 95% CIs for the Original GWAS PRS vs\nAdditive Models Including the Residual and Enhancer Partitions"), gp = gpar(fontsize = 22, fontface = "bold", col="darkred")), 
@@ -634,9 +1013,9 @@ fig3_grob= arrangeGrob(
 
 
 ggsave(
-  filename = paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_CoD_original_vs_partitioned_models.pdf"), 
+  filename = paste0(OUTPUT_prefix, "fig3_", cohort_ENHlist_thresh, "_", Sys.Date(),"_CoD_original_vs_partitioned_models.pdf"), 
   fig3_grob,  
-  width = 10, height = 5, device = "pdf", scale = 1.5)
+  width = 10, height = 4, device = "pdf", scale = 1.5)
 
 
 
@@ -650,7 +1029,7 @@ fig2_grob_modif = arrangeGrob(
                       c(3,3)),
   widths = c(0.1, 1), heights = c(0.15, 1)
 )
-fig3_modif <- fig3 + theme(axis.title.y =element_blank(), legend.position = "right")
+fig3_modif <- fig3 + theme(axis.title.y =element_blank(), legend.position = "none")
 fig3_grob_modif= arrangeGrob(
   textGrob("D)", just = "left",
            gp = gpar(fontsize = 18, fontface = "bold", col="black")), 
@@ -660,7 +1039,7 @@ fig3_grob_modif= arrangeGrob(
                       c(3,3)),
   widths = c(0.05, 1), heights = c(0.15, 1)
 )
-ggsave(filename = paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_all_plots.pdf"), 
+ggsave(filename = paste0(OUTPUT_prefix, "overall_", cohort_ENHlist_thresh, "_", Sys.Date(),"_all_plots.pdf"), 
        arrangeGrob(
          textGrob(addline_format(ENH_list),
                   gp = gpar(fontsize = 24, fontface = "bold",col="navyblue")),
@@ -677,12 +1056,13 @@ ggsave(filename = paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_all_plots.pd
 
 
 
+
 # OR based plots
 # double quantile plot for interactions
 
-#https://cran.r-project.org/web/packages/samplesizeCMH/vignettes/samplesizeCMH-introduction.html
+#https://cran.r-project.org/web/packages/samplesizeCMH/vignettes/samplesizeCMH-introduction.latex
 #https://stats.stackexchange.com/questions/593123/can-i-add-up-ors-for-specific-predictors/593130#593130
-#https://sphweb.bumc.bu.edu/otlt/mph-modules/bs/bs704-ep713_confounding-em/BS704-EP713_Confounding-EM7.html
+#https://sphweb.bumc.bu.edu/otlt/mph-modules/bs/bs704-ep713_confounding-em/BS704-EP713_Confounding-EM7.latex
 scaled_BEST_PRS_score_per_UKBB_participant
 
 # CALCULATE ORS
@@ -699,7 +1079,7 @@ ORs[,1]<-list(1:nrow(ORs))
 ORs$original_OR_quant <- "All"
 ORs
 
-sink(paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_ORs.log"))
+sink(paste0(OUTPUT_prefix, cohort_ENHlist_thresh, "_", Sys.Date(),"_ORs.log"), split = T)
 ORs_original_OR <- ORs
 for  (i in 1:number_quantiles) {
   print(i)
@@ -731,7 +1111,7 @@ sink()
     # facet_wrap(facets = vars((comp)))+
     scale_colour_manual(name="ENH compartment quantile", values = c("tomato",MetBrewer::met.brewer("Hokusai2",number_quantiles)))+
     geom_pointrange(position = position_dodge(width = 0.3))  + 
-    ylab(paste0("OR for ",condition_name))+   xlab('Original PRS quantile')+
+    ylab(paste0("OR for HCM"))+   xlab('Original PRS quantile')+
     # labs(title =  paste("Participant distribution by HCM OR by original PGC GWAS quantile\nand further by", ENH_list, "quantile"))+ 
     theme_bw() +
     theme(
@@ -745,12 +1125,12 @@ sink()
 
 # dev.off()
 f4<-arrangeGrob(
-  textGrob(paste0("Participant distribution by OR for ",addline_format(condition_name),", first by original GWAS quantile (in red)\nand further by ", addline_format(ENH_list), " quantile (shades of blue)"), gp = gpar(fontsize = 16, fontface = "bold",col="maroon")), 
+  textGrob(paste0("Participant distribution by OR for HCM, first by original GWAS quantile (in red)\nand further by ", addline_format(ENH_list), " quantile (shades of blue)"), gp = gpar(fontsize = 16, fontface = "bold",col="maroon")), 
   p4,
   ncol=1,
   heights = c(0.1, 1))
 
 
-ggsave(filename = paste0(OUTPUT_prefix, ENH_list, "_", Sys.Date(),"_Quant_by_quant_plot.pdf"),
+ggsave(filename = paste0(OUTPUT_prefix, cohort_ENHlist_thresh, "_", Sys.Date(),"_Quant_by_quant_plot.pdf"),
        f4,  width = 9, height = 7)
 
