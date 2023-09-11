@@ -27,7 +27,7 @@ Channel.fromPath( '//gpfs/work5/0/pgcdac/DWFV2CJb8Piv_0116_pgc_data/scz/wave3/v1
     .branch { sample_name, sample_path ->
         no_PCA: sample_name in no_PCA_sample_list
             return tuple( tuple( sample_name, sample_path ) )
-        with_PCA: true//sample_name in test_sample_list
+        with_PCA: sample_name in test_sample_list //true
             return tuple( tuple( sample_name, sample_path ) )
     } \
     .set { inputs }
