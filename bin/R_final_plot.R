@@ -84,7 +84,7 @@ number_quantiles = 3
 # pop_prev = population prevalence
 pop_prev = 0.01
 
-max_cod_per_snp = 140
+max_cod_per_snp = ifelse(grepl(x = threshold, pattern = "0.5"), 100, 250)
 
 
 #OUTPUT_prefix
