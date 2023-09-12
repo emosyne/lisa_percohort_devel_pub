@@ -856,7 +856,7 @@ fig1grob<- arrangeGrob(
 )
 
 ggsave(
-  filename = paste0(OUTPUT_prefix, "fig1_", cohort_ENHlist_thresh, "_", Sys.Date(),"_CoD_main_partitions.pdf"), 
+  filename = paste0(OUTPUT_prefix, cohort_ENHlist_thresh, "_fig1_",  Sys.Date(),"_CoD_main_partitions.pdf"), 
   fig1grob,  
   width = 17, height = 5)
 
@@ -929,7 +929,7 @@ fig2_grob = arrangeGrob(
 )
 
 ggsave(
-  filename = paste0(OUTPUT_prefix, "fig2_", cohort_ENHlist_thresh, "_", Sys.Date(),"_CoD_enh_partitions.pdf"), 
+  filename = paste0(OUTPUT_prefix,  cohort_ENHlist_thresh, "_fig2_",Sys.Date(),"_CoD_enh_partitions.pdf"), 
   fig2_grob,  
   width = 10, height = 4, device = "pdf", scale = 1.5)
 
@@ -1016,7 +1016,7 @@ fig3_grob= arrangeGrob(
 
 
 ggsave(
-  filename = paste0(OUTPUT_prefix, "fig3_", cohort_ENHlist_thresh, "_", Sys.Date(),"_CoD_original_vs_partitioned_models.pdf"), 
+  filename = paste0(OUTPUT_prefix,  cohort_ENHlist_thresh, "_fig3_", Sys.Date(),"_CoD_original_vs_partitioned_models.pdf"), 
   fig3_grob,  
   width = 10, height = 4, device = "pdf", scale = 1.5)
 
