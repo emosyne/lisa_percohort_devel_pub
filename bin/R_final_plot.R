@@ -785,7 +785,7 @@ pos = position_identity()
                               point.padding = NA, box.padding = 0.5)+ #nudge_y = -0.2, 
     scale_x_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .15))) + 
     scale_y_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
-    xlab("") +  ylab("HCM diagnosis ~")+
+    xlab("") +  ylab("SCZ diagnosis ~")+
     theme_bw() +
     theme(
       legend.position = "none",  
@@ -914,7 +914,7 @@ fig2 <-
     point.padding = NA, box.padding = 0.5) +
   scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .15)))  +
   scale_x_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
-  ylab("") +  xlab(paste0("HCM diagnosis ~"))+theme_bw() +
+  ylab("") +  xlab(paste0("SCZ diagnosis ~"))+theme_bw() +
   theme(
     legend.position = "none",  
     text=element_text(lineheight = 0.8, angle = 0, size = 21, color = "gray8")
@@ -954,7 +954,7 @@ ggsave(
                              point.padding = NA, box.padding = 0.5)+ 
    scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, .1))) + 
    scale_x_discrete(expand = expansion(add = .7)) + #.6 is default - add a little spacing to the sides
-   ylab("") +  xlab(paste0("HCM diagnosis ~"))+
+   ylab("") +  xlab(paste0("SCZ diagnosis ~"))+
    theme_bw() +
    theme(
      legend.position = "none",  
@@ -1114,8 +1114,8 @@ sink()
     # facet_wrap(facets = vars((comp)))+
     scale_colour_manual(name="ENH compartment quantile", values = c("tomato",MetBrewer::met.brewer("Hokusai2",number_quantiles)))+
     geom_pointrange(position = position_dodge(width = 0.3))  + 
-    ylab(paste0("OR for HCM"))+   xlab('Original PRS quantile')+
-    # labs(title =  paste("Participant distribution by HCM OR by original PGC GWAS quantile\nand further by", ENH_list, "quantile"))+ 
+    ylab(paste0("OR for SCZ"))+   xlab('Original PRS quantile')+
+    # labs(title =  paste("Participant distribution by SCZ OR by original PGC GWAS quantile\nand further by", ENH_list, "quantile"))+ 
     theme_bw() +
     theme(
       strip.text.x = element_text(size = rel(1.3)),
@@ -1128,7 +1128,7 @@ sink()
 
 # dev.off()
 f4<-arrangeGrob(
-  textGrob(paste0("Participant distribution by OR for HCM, first by original GWAS quantile (in red)\nand further by ", addline_format(ENH_list), " quantile (shades of blue)"), gp = gpar(fontsize = 16, fontface = "bold",col="maroon")), 
+  textGrob(paste0("Participant distribution by OR for SCZ, first by original GWAS quantile (in red)\nand further by ", addline_format(ENH_list), " quantile (shades of blue)"), gp = gpar(fontsize = 16, fontface = "bold",col="maroon")), 
   p4,
   ncol=1,
   heights = c(0.1, 1))
