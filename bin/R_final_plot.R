@@ -5,22 +5,22 @@
 
 library(tidyverse)
 library(data.table)
-# require(rms)
-# library(fst)
 library(gridExtra)
 library(grid)
+library(boot)
+library(ggpubr)
 
 #INPUT
 args = commandArgs()
 
 
 # R_final_plot.R $task.cpus ${cohort_ENHpart} ${cohort_fam} \
-        # ${TS_ENH_GWAS_compartment_originalOR_summary} ${TS_ENH_GWAS_compartment_originalOR_best}\
-        # ${TS_ENH_GWAS_compartment_OR_by_measure1_summary} ${TS_ENH_GWAS_compartment_OR_by_measure1_best}\
-        # ${TS_ENH_GWAS_compartment_OR_by_measure2_summary} ${TS_ENH_GWAS_compartment_OR_by_measure2_best}\
+        # ${EPWAS_originalOR_summary} ${EPWAS_originalOR_best}\
+        # ${EPWAS_OR_by_measure1_summary} ${EPWAS_OR_by_measure1_best}\
+        # ${EPWAS_OR_by_measure2_summary} ${EPWAS_OR_by_measure2_best}\
         # ${residual_GWAS_compartment_summary} ${residual_GWAS_compartment_best}\
         # ${merged_GWAS_summary} ${merged_GWAS_best}\
-        # ${TS_ENH_GWAS_compartment_originalOR_prsice} ${TS_ENH_GWAS_compartment_OR_by_measure1_prsice} ${TS_ENH_GWAS_compartment_OR_by_measure2_prsice} ${residual_GWAS_compartment_prsice} ${merged_GWAS_prsice}  \
+        # ${EPWAS_originalOR_prsice} ${EPWAS_OR_by_measure1_prsice} ${EPWAS_OR_by_measure2_prsice} ${residual_GWAS_compartment_prsice} ${merged_GWAS_prsice}  \
         # ${original_LOO_GWAS_summary} ${original_LOO_GWAS_prsice} ${original_LOO_GWAS_best}\
         # ${modif_name_1} ${modif_name_2} ${CTthreshold}
 
@@ -35,23 +35,23 @@ setDTthreads(nthreads)
 (diagnosis = fread(args[10], header=F, col.names = c("FID", "IID", "IIDf", "IIDm", "sex", "dx" )) %>%
     dplyr::select("FID", "IID", "dx"))
 
-TS_ENH_GWAS_compartment_originalOR_summary = args[11]
-TS_ENH_GWAS_compartment_originalOR_best = 
+EPWAS_originalOR_summary = args[11]
+EPWAS_originalOR_best = 
   fread(args[12], select=c("FID", "IID", "PRS")) %>% 
-  dplyr::rename(TS_ENH_GWAS_compartment_originalOR_best_PRS = PRS)
+  dplyr::rename(EPWAS_originalOR_best_PRS = PRS)
 
-TS_ENH_GWAS_compartment_OR_by_measure1_summary = args[13]
-TS_ENH_GWAS_compartment_OR_by_measure1_best = 
+EPWAS_OR_by_measure1_summary = args[13]
+EPWAS_OR_by_measure1_best = 
   fread(args[14], select=c("FID", "IID", "PRS")) %>% 
-  dplyr::rename(TS_ENH_GWAS_compartment_OR_by_measure1_best_PRS = PRS)
+  dplyr::rename(EPWAS_OR_by_measure1_best_PRS = PRS)
 
-TS_ENH_GWAS_compartment_OR_by_measure2_summary = args[15]
-TS_ENH_GWAS_compartment_OR_by_measure2_best = 
+EPWAS_OR_by_measure2_summary = args[15]
+EPWAS_OR_by_measure2_best = 
   fread(args[16], select=c("FID", "IID", "PRS")) %>% 
-  dplyr::rename(TS_ENH_GWAS_compartment_OR_by_measure2_best_PRS = PRS)
+  dplyr::rename(EPWAS_OR_by_measure2_best_PRS = PRS)
 # ${residual_GWAS_compartment_summary} ${residual_GWAS_compartment_best}\
         # ${merged_GWAS_summary} ${merged_GWAS_best}\
-        # ${TS_ENH_GWAS_compartment_originalOR_prsice} ${TS_ENH_GWAS_compartment_OR_by_measure1_prsice} ${TS_ENH_GWAS_compartment_OR_by_measure2_prsice} 
+        # ${EPWAS_originalOR_prsice} ${EPWAS_OR_by_measure1_prsice} ${EPWAS_OR_by_measure2_prsice} 
         # ${residual_GWAS_compartment_prsice} ${merged_GWAS_prsice}  \
         # ${original_LOO_GWAS_summary} ${original_LOO_GWAS_prsice} ${original_LOO_GWAS_best}\
         # ${modif_name_1} ${modif_name_2} ${CTthreshold}
@@ -61,9 +61,9 @@ residual_GWAS_compartment_best =
   dplyr::rename(residual_GWAS_compartment_best_PRS = PRS)
 
 
-TS_ENH_GWAS_compartment_originalOR_prsice = args[21]
-TS_ENH_GWAS_compartment_OR_by_measure1_prsice = args[22]
-TS_ENH_GWAS_compartment_OR_by_measure2_prsice = args[23]
+EPWAS_originalOR_prsice = args[21]
+EPWAS_OR_by_measure1_prsice = args[22]
+EPWAS_OR_by_measure2_prsice = args[23]
 residual_GWAS_compartment_prsice = args[24]
 merged_GWAS_prsice = args[25]
 
@@ -76,12 +76,15 @@ modif_name_1 = args[29]
 modif_name_2 = args[30]
 threshold = args[31]
 
+cohort_ENHlist_thresh = ENH_list
 
 #set input variables
 number_quantiles = 3
-condition_name = "schizophrenia"
+
 # pop_prev = population prevalence
 pop_prev = 0.01
+
+max_cod_per_snp = 140
 
 
 #OUTPUT_prefix
