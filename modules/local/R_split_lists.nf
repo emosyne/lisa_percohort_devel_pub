@@ -1,6 +1,6 @@
 process R_split_lists {
     // debug true
-    container 'emosyne/r_docker:1.99'
+    container 'emosyne/r_docker:2.0'
     label 'process_high'
     tag "${cohort}_${ENH_list}"
     cache "lenient"

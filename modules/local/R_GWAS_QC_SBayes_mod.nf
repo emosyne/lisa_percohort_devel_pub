@@ -1,7 +1,6 @@
-process R_PRS_QC {
+process R_GWAS_QC_SBayes {
     // debug true
     container 'emosyne/r_docker:2.0'
-    // container 'emosyne/simpler:1.1'
     label 'process_high'
     tag "$cohort"
     cache "lenient"
@@ -24,7 +23,7 @@ process R_PRS_QC {
     """
     bimfile="${cohort_dir}/imputed/hardcall_genotypes/*.bgn.bim"
 
-    R_PRS_QC2.R ${het} \$bimfile ${LOO_GWAS_QC}  ${cohort} ${LOO_GWAS_QC_clumped_SNPs}
+    R_GWAS_QC_SBayes.R ${het} \$bimfile ${LOO_GWAS_QC}  ${cohort} ${LOO_GWAS_QC_clumped_SNPs}
     
     """
 }
