@@ -1,4 +1,5 @@
 include { bash_base_GWAS_QC }           from '../modules/local/bash_base_GWAS_QC.nf'
+include { R_GWAS_QC_SBayes }            from '../modules/local/R_GWAS_QC_SBayes_mod.nf'
 include { PLINK2_QC_PRUNE_HET }         from '../modules/local/PLINK2_QC_PRUNE_HET_mod.nf'
 include { R_PRS_QC }                    from '../modules/local/R_PRS_QC_mod.nf'
 include { PLINK_PRODUCE_QC_DATASET }    from '../modules/local/PLINK_PRODUCE_QC_DATASET_mod.nf'
