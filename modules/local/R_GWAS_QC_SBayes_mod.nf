@@ -13,7 +13,7 @@ process R_GWAS_QC_SBayes {
     
 
     output:
-    tuple val(cohort), path (*),  emit: SBayes
+    tuple val(cohort), path ("*"),  emit: SBayes
     
     
     script:
