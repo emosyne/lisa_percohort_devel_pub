@@ -13,34 +13,44 @@ args = commandArgs()
 
 print(args)
 
-orig_GWAS = args[8]
-cohort_bimfile = args[9]
-LOO_GWAS = args[10]
-(cohort = args[11])
+#R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path}
+(cohort = args[8])
+LOO_GWAS_QC_noclump = fread(args[9], select=c("CHR", "SNP", "BP", "A1", "A2", "FRQ_A_51419", "FRQ_U_74993", "OR", "SE", "P", "Nca", "Nco"))
+private_input_files_path = args[10]
+# LOO_GWAS = args[10]
+# 
 
 
 
+#current GWAS format:
+# (/gpfs/home2/osimoe/nf) [osimoe@int6 lisa_percohort_devel_pub]$ zcat  /gpfs/home2/osimoe/.nextflow/assets/emosyne/lisa_percohort_devel_pub/work/a4/b9989df138ae1893b5033a3b5a8e66/xs234_GWAS_QC_noclump.gz | head | column -t
+# CHR  SNP         BP         A1  A2  FRQ_A_51419  FRQ_U_74993  INFO   OR       SE      P       ngt  Direction                                                                    HetISqt  HetDf  HetPVa   Nca    Nco    Neff
+# 8    rs62513865  101592213  C   T   0.931        0.928        0.964  1.01005  0.0175  0.5677  0    --+-++-+--+-+-++-++-++++-+--+-++-----++--------++++++-+-+-+-++---++-+--++++  2.9      74     0.4075   51419  74993  56643.62
+# 8    rs79643588  106973048  G   A   0.908        0.906        0.998  0.99134  0.0151  0.5656  0    +--+-+----+-+++++++++++-+-+-+++--+-----+----+++----++-+---++++++++++---+--+  23.0     74     0.04289  51419  74993  56643.62
 
 
 ### Format GWAS in cojo
 # colnames(formatted.gwas) = c("SNP", "A1", "A2", "freq", "b", "se", "p", "N")
+LOO_GWAS_QC_noclump <- LOO_GWAS_QC_noclump %>%
+    mutate(freq = (( FRQ_A_51419 * Nca) + (FRQ_U_74993 * Nco) ) /(Nca + Nco), FRQ_A_51419 = NULL, FRQ_U_74993 = NULL,
+           N    = Nca + Nco, Nca = NULL, Nco = NULL,
+           b    = log(OR), OR = NULL) %>%
+    select(SNP,A1, A2, freq, b, se=SE, p=P, N)
 
-head(orig_GWAS)
+head(LOO_GWAS_QC_noclump)
   
-orig_GWAS$freq = ( (orig_GWAS[,FCAS] * orig_GWAS[,NCAS]) + (orig_GWAS[,FCON] * orig_GWAS[,NCON]) ) /(orig_GWAS[,NCAS] + orig_GWAS[,NCON])
-orig_GWAS$N =  (orig_GWAS[,NCAS] + orig_GWAS[,NCON])
 
-cojo_GWAS <- orig_GWAS %>% select(SNP, A1, A2, freq, b=BETA, se=SE, p=P, N)
 
-data.table::fwrite(x = cojo_GWAS, file = "gwas.cojo")
+data.table::fwrite(x = cojo_GWAS, file = paste0(cohort,"_gwas.cojo"))
 
 
 
 # Tidy: optional step, tidy summary data
 ## "log2file=TRUE" means the messages will be redirected to a log file 
+LDdir <- paste0(private_input_files_path, "LD_ref/ukbEUR_HM3/")
 
-SBayesRC::tidy(mafile="gwas.cojo", LDdir='ukbEUR_HM3/', 
-                  output='cojo_GWAS_tidy.ma', log2file=TRUE)
+SBayesRC::tidy(mafile=paste0(cohort,"_gwas.cojo"), LDdir=LDdir, 
+               output=paste0(cohort,'cojo_GWAS_tidy.ma'), log2file=TRUE)
 
 
 
@@ -48,55 +58,12 @@ SBayesRC::tidy(mafile="gwas.cojo", LDdir='ukbEUR_HM3/',
 
 # Impute: optional step if your summary data doesn't cover the SNP panel
 
-SBayesRC::impute(mafile='cojo_GWAS_tidy.ma', LDdir='ukbEUR_HM3/', 
-                  output='cojo_GWAS_imp.ma', log2file=TRUE)
+SBayesRC::impute(mafile=paste0(cohort,'cojo_GWAS_tidy.ma'), LDdir=LDdir, 
+                 output=paste0(cohort,'cojo_GWAS_imp.ma'), log2file=TRUE)
 
 
 
-
-# SBayesRC: main function for SBayesRC
-```{bash }
-#!/bin/bash
-#PBS -lselect=1:ncpus=12:mem=250gb
-#PBS -lwalltime=24:0:0
-#PBS -N SBayesRC
-source /rds/general/user/eosimo/home/.bashrc
-module load anaconda3/personal
-source activate r422
-
-cd /rds/general/user/eosimo/home/lenhard_prs/SBayesRC
-
-##############################################
-# Variables: need to be fixed
-ma_file="/rds/general/user/eosimo/home/lenhard_prs/SBayesRC/gwas.cojo"               # GWAS summary in COJO format (the only input)
-ld_folder="/rds/general/user/eosimo/home/lenhard_prs/SBayesRC/ukbEUR_Imputed"        # LD reference 
-annot="/rds/general/user/eosimo/home/lenhard_prs/SBayesRC/annot_baseline2_2_with_enhancers.txt"         # Functional annotation 
-out_prefix="annot_baseline2_2_with_enhancers"   # Output prefix, e.g. "./test"
-threads=12                       # Number of CPU cores
-
-##############################################
-# Code: usually don't need a change in this section
-## Note: Flags were documented in the package, use ?function in R to lookup.
-## We suggest to run those in multiple jobs (tasks)
-export OMP_NUM_THREADS=$threads # Revise the threads
-
-## Tidy: optional step, tidy summary data
-### "log2file=TRUE" means the messages will be redirected to a log file 
-#Rscript -e "SBayesRC::tidy(mafile='$ma_file', LDdir='$ld_folder', \
-#                  output='${out_prefix}_tidy.ma', log2file=TRUE)"
-### Best practice: read the log to check issues in your GWAS summary data.  
-
-## Impute: optional step if your summary data doesn't cover the SNP panel
-#Rscript -e "SBayesRC::impute(mafile='${out_prefix}_tidy.ma', LDdir='$ld_folder', \
-#                  output='${out_prefix}_imp.ma', log2file=TRUE)"
-
-# SBayesRC: main function for SBayesRC
-Rscript -e "SBayesRC::sbayesrc(mafile='output_imp.ma', LDdir='$ld_folder', \
-                  outPrefix='output/${out_prefix}_sbrc', annot='$annot', log2file=TRUE)"
-# Alternative run, SBayesRC without annotation (similar to SBayesR, not recommended)
-# Rscript -e "SBayesRC::sbayesrc(mafile='${out_prefix}_imp.ma', LDdir='$ld_folder', \
-#                  outPrefix='${out_prefix}_sbrc_noAnnot', log2file=TRUE)"
-
-
-
-```
+SBayesRC::sbayesrc(mafile=paste0(cohort,'cojo_GWAS_imp.ma'), LDdir=LDdir, 
+                  outPrefix=paste0(cohort,'_sbrc'),
+                  annot=paste0(private_input_files_path, "SBayes_annots/annot_binary_enhancers_only.txt.gz"), 
+                  log2file=TRUE)

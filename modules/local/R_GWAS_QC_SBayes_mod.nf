@@ -9,7 +9,7 @@ process R_GWAS_QC_SBayes {
 
     input: 
     // [xclm2, xclm2.prune.in, xclm2.het, xclm2_GWAS_QC_noclump.gz, xclm2_GWAS_QC_clump.clumped, /home/osimoe/PGC_w3_data/xclm2]
-    tuple val(cohort), path (prune), path (het), path(LOO_GWAS_QC), path(LOO_GWAS_QC_clumped_SNPs), path(cohort_dir)
+    tuple val(cohort), path (GWAS_QC_noclump), path (private_input_files_path)
     
     
 
@@ -21,9 +21,7 @@ process R_GWAS_QC_SBayes {
     
     script:
     """
-    bimfile="${cohort_dir}/imputed/hardcall_genotypes/*.bgn.bim"
-
-    R_GWAS_QC_SBayes.R ${het} \$bimfile ${LOO_GWAS_QC}  ${cohort} ${LOO_GWAS_QC_clumped_SNPs}
+    R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path}
     
     """
 }
