@@ -65,7 +65,7 @@ SBayesRC_annot_files =
         .map { SBayesRC_annot -> ["${SBayesRC_annot}", 
             file("/home/osimoe/private_input_files/SBayes_annots/${SBayesRC_annot}.txt.gz", checkIfExists: true)]
             } 
-SBayesRC_annot_files.view()
+
 
 //LD ref
 LD_reference = Channel.from("bed","bim","fam") 
@@ -91,9 +91,10 @@ workflow lisa_percohort_devel {
     )
 
 
-    // bash_base_GWAS_QC.out.GWAS_QC_noclump
-    //     .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
-    //     .view()
+    bash_base_GWAS_QC.out.GWAS_QC_noclump
+        .mix(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+        .combine(SBayesRC_annot_files)
+        .view()
 
     // R_GWAS_QC_SBayes(
     //     bash_base_GWAS_QC.out.GWAS_QC_noclump
