@@ -8,7 +8,9 @@ process R_GWAS_QC_SBayes {
 
 
     input: 
-    tuple val(cohort), path (GWAS_QC_noclump), path (private_input_files_path)
+    // [xs234, /path/to/xs234_GWAS_QC_noclump.gz, annot_baseline2_2_with_continuous_enhancers, /home/osimoe/private_input_files/SBayes_annots/annot_baseline2_2_with_continuous_enhancers.txt.gz]
+    tuple val(cohort), path (GWAS_QC_noclump), \
+        val (SBayesRC_annot), path (private_input_files_path)
     
     
 

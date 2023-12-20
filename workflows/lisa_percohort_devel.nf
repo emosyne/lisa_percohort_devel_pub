@@ -92,9 +92,10 @@ workflow lisa_percohort_devel {
 
 
     bash_base_GWAS_QC.out.GWAS_QC_noclump
-        .mix(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+        .concat(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
         .combine(SBayesRC_annot_files)
         .view()
+    //     // [xs234, /path/to/xs234_GWAS_QC_noclump.gz, annot_baseline2_2_with_continuous_enhancers, /home/osimoe/private_input_files/SBayes_annots/annot_baseline2_2_with_continuous_enhancers.txt.gz]
 
     // R_GWAS_QC_SBayes(
     //     bash_base_GWAS_QC.out.GWAS_QC_noclump
