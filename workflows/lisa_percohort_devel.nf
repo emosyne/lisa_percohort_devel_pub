@@ -81,9 +81,9 @@ workflow lisa_percohort_devel {
     )
 
 
-    bash_base_GWAS_QC.out.GWAS_QC_noclump
-        .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
-        .view()
+    // bash_base_GWAS_QC.out.GWAS_QC_noclump
+    //     .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+    //     .view()
 
     R_GWAS_QC_SBayes(
         bash_base_GWAS_QC.out.GWAS_QC_noclump
