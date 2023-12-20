@@ -41,7 +41,7 @@ head(LOO_GWAS_QC_noclump)
   
 
 
-data.table::fwrite(x = cojo_GWAS, file = paste0(cohort,"_gwas.cojo"))
+data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"))
 
 
 
@@ -49,8 +49,8 @@ data.table::fwrite(x = cojo_GWAS, file = paste0(cohort,"_gwas.cojo"))
 ## "log2file=TRUE" means the messages will be redirected to a log file 
 LDdir <- paste0(private_input_files_path, "LD_ref/ukbEUR_HM3/")
 
-SBayesRC::tidy(mafile=paste0(cohort,"_gwas.cojo"), LDdir=LDdir, 
-               output=paste0(cohort,'cojo_GWAS_tidy.ma'), log2file=TRUE)
+SBayesRC::tidy(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), LDdir=LDdir, 
+               output=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=TRUE)
 
 
 
@@ -58,12 +58,12 @@ SBayesRC::tidy(mafile=paste0(cohort,"_gwas.cojo"), LDdir=LDdir,
 
 # Impute: optional step if your summary data doesn't cover the SNP panel
 
-SBayesRC::impute(mafile=paste0(cohort,'cojo_GWAS_tidy.ma'), LDdir=LDdir, 
-                 output=paste0(cohort,'cojo_GWAS_imp.ma'), log2file=TRUE)
+SBayesRC::impute(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=LDdir, 
+                 output=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=TRUE)
 
 
 
-SBayesRC::sbayesrc(mafile=paste0(cohort,'cojo_GWAS_imp.ma'), LDdir=LDdir, 
+SBayesRC::sbayesrc(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=LDdir, 
                   outPrefix=paste0(cohort,'_sbrc'),
                   annot=paste0(private_input_files_path, "SBayes_annots/annot_binary_enhancers_only.txt.gz"), 
                   log2file=TRUE)
