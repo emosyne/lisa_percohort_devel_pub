@@ -8,9 +8,10 @@ process R_GWAS_QC_SBayes {
 
 
     input: 
-    // [xs234, /path/to/xs234_GWAS_QC_noclump.gz, annot_baseline2_2_with_continuous_enhancers, /home/osimoe/private_input_files/SBayes_annots/annot_baseline2_2_with_continuous_enhancers.txt.gz]
+    // [xs234, /path/xs234_GWAS_QC_noclump.gz, annot_baseline2_2_with_continuous_enhancers, /path/annot_baseline2_2_with_continuous_enhancers.txt.gz, /home/osimoe/private_input_files]
     tuple val(cohort), path (GWAS_QC_noclump), \
-        val (SBayesRC_annot), path (private_input_files_path)
+        val (SBayesRC_annot), path (SBayesRC_annot_path), \
+        path(private_input_files_path)
     
     
 
@@ -20,7 +21,7 @@ process R_GWAS_QC_SBayes {
     
     script:
     """
-    R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path}
+    R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path} ${SBayesRC_annot} ${SBayesRC_annot_path}
     
     """
 }

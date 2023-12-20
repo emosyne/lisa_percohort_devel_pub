@@ -13,12 +13,12 @@ args = commandArgs()
 
 print(args)
 
-#R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path}
+#R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path} ${SBayesRC_annot} ${SBayesRC_annot_path}
 (cohort = args[8])
 LOO_GWAS_QC_noclump = fread(args[9], select=c("CHR", "SNP", "BP", "A1", "A2", "FRQ_A_51419", "FRQ_U_74993", "OR", "SE", "P", "Nca", "Nco"))
 private_input_files_path = args[10]
-# LOO_GWAS = args[10]
-# 
+SBayesRC_annot = args[11]
+SBayesRC_annot_path = args[12]
 
 
 
@@ -64,6 +64,6 @@ SBayesRC::impute(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=LDd
 
 
 SBayesRC::sbayesrc(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=LDdir, 
-                  outPrefix=paste0(cohort,'_sbrc'),
-                  annot=paste0(private_input_files_path, "/SBayes_annots/annot_binary_enhancers_only.txt.gz"), 
+                  outPrefix=paste0(cohort,'_',SBayesRC_annot,'_sbrc'),
+                  annot=SBayesRC_annot_path, 
                   log2file=TRUE)
