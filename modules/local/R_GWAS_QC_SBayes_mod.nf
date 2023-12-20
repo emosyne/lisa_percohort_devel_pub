@@ -1,7 +1,7 @@
 process R_GWAS_QC_SBayes {
     // debug true
     container 'emosyne/r_docker:2.0'
-    label 'process_high'
+    label 'process_high_memory'
     tag "$cohort"
     cache "lenient"
     
