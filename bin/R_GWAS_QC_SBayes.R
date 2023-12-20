@@ -65,5 +65,5 @@ SBayesRC::impute(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=LDd
 
 SBayesRC::sbayesrc(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=LDdir, 
                   outPrefix=paste0(cohort,'_sbrc'),
-                  annot=paste0(private_input_files_path, "SBayes_annots/annot_binary_enhancers_only.txt.gz"), 
+                  annot=paste0(private_input_files_path, "/SBayes_annots/annot_binary_enhancers_only.txt.gz"), 
                   log2file=TRUE)

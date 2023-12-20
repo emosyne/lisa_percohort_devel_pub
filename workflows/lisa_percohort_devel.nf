@@ -54,8 +54,18 @@ enhancer_lists_bed_files =
     
 // enhancer_lists_bed_files.view()
 
-
-
+SBayesRC_annot_files = 
+    Channel.from(
+        "annot_baseline2.2", 
+        "annot_binary_enhancers_only",
+        "annot_baseline2_2_with_binary_enhancers",
+        "annot_continuous_enhancers_only",
+        "annot_baseline2_2_with_continuous_enhancers"
+        )
+        .map { SBayesRC_annot -> ["${SBayesRC_annot}", 
+            file("/home/osimoe/private_input_files/SBayes_annots/${SBayesRC_annot}.txt.gz", checkIfExists: true)]
+            } 
+SBayesRC_annot_files.view()
 
 //LD ref
 LD_reference = Channel.from("bed","bim","fam") 
@@ -85,11 +95,11 @@ workflow lisa_percohort_devel {
     //     .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
     //     .view()
 
-    R_GWAS_QC_SBayes(
-        bash_base_GWAS_QC.out.GWAS_QC_noclump
-            .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
-    )
-    R_GWAS_QC_SBayes.out.SBayes.view()
+    // R_GWAS_QC_SBayes(
+    //     bash_base_GWAS_QC.out.GWAS_QC_noclump
+    //         .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+    // )
+    // R_GWAS_QC_SBayes.out.SBayes.view()
 
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
