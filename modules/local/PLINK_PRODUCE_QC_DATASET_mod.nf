@@ -2,7 +2,7 @@ process PLINK_PRODUCE_QC_DATASET {
     // debug true
     tag "$cohort"
     label 'process_high'
-    container 'emosyne/plink2:1.23'
+    container 'emosyne/plink2:7.2_Alpha5.9'
     cache "lenient"
 
 

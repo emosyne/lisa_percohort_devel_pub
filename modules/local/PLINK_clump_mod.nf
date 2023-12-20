@@ -2,7 +2,7 @@ process PLINK_clump {
     // debug true
     tag "${cohort}_${ENH_list}"
     label 'process_high'
-    container 'emosyne/plink2:1.23'
+    container 'emosyne/plink2:7.2_Alpha5.9'
     // cache "lenient"
 
     input:

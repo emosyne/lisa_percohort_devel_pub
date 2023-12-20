@@ -68,8 +68,8 @@ SBayesRC_annot_files =
 
 
 //LD ref
-LD_reference = Channel.from("bed","bim","fam") 
-    .map { ext -> [file("/home/osimoe/LD_ref/EUR_phase3_autosomes_hg19.${ext}")] }
+LD_reference_GRCh37 = Channel.from("bed","bim","fam") 
+    .map { ext -> [file("/home/osimoe/private_input_files/LD_ref/1000g_phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes_EUR_annot_GRCh37.${ext}")] }
             .collect()
 
 
@@ -80,14 +80,14 @@ workflow lisa_percohort_devel {
     // BASE = LOO GWAS
     // TARGET = cohort
 
-    input = LOO_PGC_GWASES.join(validation_samples)
-    // input.first().view()
+    input_GRCh37 = LOO_PGC_GWASES.join(validation_samples)
+    // input_GRCh37.first().view()
 
     // BASE (GWAS) QC: REMOVE LOW MAF AND INFO SCORES
     //produce GWAS_QC
     bash_base_GWAS_QC (
-        input
-            .combine(LD_reference)
+        input_GRCh37
+            .combine(LD_reference_GRCh37)
     )
 
 
@@ -107,7 +107,7 @@ workflow lisa_percohort_devel {
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
     // PLINK2_QC_PRUNE_HET (
-    //     input
+    //     input_GRCh37
     // )
 
     // // PLINK2_QC_PRUNE_HET.out.pruned_variants_het
@@ -161,14 +161,14 @@ workflow lisa_percohort_devel {
     
     
     // // R_prepare_lists_for_clump.out.lists_before_clump
-    // //     .combine(LD_reference)
+    // //     .combine(LD_reference_GRCh37)
     // //     .view()
 
 
     // PLINK_clump (
     //     //CLUMPING of enhancer-based SNP compartments together 
     //     R_prepare_lists_for_clump.out.lists_before_clump
-    //         .combine(LD_reference)
+    //         .combine(LD_reference_GRCh37)
     // )
     // // PLINK_clump.out.clumped_SNPs_and_noclump_lists
     // //     .view()
@@ -186,14 +186,14 @@ workflow lisa_percohort_devel {
     // R_split_lists.out.partitioned
     //     .combine(PLINK_PRODUCE_QC_DATASET.out.target_QC, by: [0,0])//[celso, celso_QC.bed, celso_QC.bim, celso_QC.fam]
     //     .combine(validation_samples, by: [0,0])
-    //     .combine(LD_reference)
+    //     .combine(LD_reference_GRCh37)
     //     .combine(R_PRS_QC.out.clumped_LOO_GWAS, by: [0,0])
     //     .map { [it, "0.5"].flatten() }         // ######################## SET CT THRESHOLD FOR PRSICE ##################
     //     .set{combined_splitlists_bedfile_QCeddata_LDdata_05}
     // R_split_lists.out.partitioned
     //     .combine(PLINK_PRODUCE_QC_DATASET.out.target_QC, by: [0,0])//[celso, celso_QC.bed, celso_QC.bim, celso_QC.fam]
     //     .combine(validation_samples, by: [0,0])
-    //     .combine(LD_reference)
+    //     .combine(LD_reference_GRCh37)
     //     .combine(R_PRS_QC.out.clumped_LOO_GWAS, by: [0,0])
     //     .map { [it, "0.05"].flatten() }         // ######################## SET CT THRESHOLD FOR PRSICE ##################
     //     .set{combined_splitlists_bedfile_QCeddata_LDdata_005}

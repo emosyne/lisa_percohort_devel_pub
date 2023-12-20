@@ -21,6 +21,7 @@ process R_GWAS_QC_SBayes {
     
     script:
     """
+    
     R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path} ${SBayesRC_annot} ${SBayesRC_annot_path}
     
     """
