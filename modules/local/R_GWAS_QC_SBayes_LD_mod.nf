@@ -23,7 +23,7 @@ process R_GWAS_QC_SBayes_LD {
     script:
     """
     
-    R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path} 
+    R_GWAS_QC_SBayes_LD.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path} 
     
     """
 }
