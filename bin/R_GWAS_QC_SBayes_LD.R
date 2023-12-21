@@ -54,7 +54,7 @@ data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_n
 SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), 
                   genoPrefix=LDfile_path,
                   outDir=paste0(cohort,'_LD'), genoCHR='', 
-                  blockRef='', log2file=TRUE)
+                  blockRef='', log2file=F)
 
 # Step2: generate each LD matrix for blocks
 #  Loop idx from 1 to NUM_BLOCK (591)
@@ -62,7 +62,7 @@ SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"),
 #  Input depends on $outDir/ld.sh, $outDir/snplist/$idx.snplist
 #  Ouput $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
 for(idx in (1:591)) {
-    SBayesRC::LDstep2(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=TRUE)
+    SBayesRC::LDstep2(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
 }
 
 
@@ -73,11 +73,11 @@ for(idx in (1:591)) {
 #  Output $outDir/block$block.eigen.bin, $outDir/block$block.eigen.bin.log
 # export OMP_NUM_THREADS=$threads  # parallel computing supported in this step
 for(idx in (1:591)) {
-    SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=TRUE)
+    SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
 }
 
 # Step4: merge LD information
-SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=TRUE)
+SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=F)
 
 # Step5: clean if necessary
 # Essential for analysis: $outDir/ldm.info, $outDir/snp.info, $outDir/block*.eigen.bin 

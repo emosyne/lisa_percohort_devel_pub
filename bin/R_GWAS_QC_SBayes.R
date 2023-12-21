@@ -107,4 +107,4 @@ SBayesRC::impute(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=pas
 # SBayesRC::sbayesrc(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=LDdir, 
 #                   outPrefix=paste0(cohort,'_',SBayesRC_annot,'_sbrc'),
 #                   annot=SBayesRC_annot_path, 
-#                   log2file=TRUE)
+#                   log2file=F)
