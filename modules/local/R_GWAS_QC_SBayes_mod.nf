@@ -17,13 +17,13 @@ process R_GWAS_QC_SBayes {
 
     output:
     // $outDir/ldm.info, $outDir/snp.info, $outDir/block*.eigen.bin 
-    tuple val(cohort), path ("${cohort}_LD/ldm.info"), path ("${cohort}_LD/snp.info"), path ("${cohort}_LD/block*.eigen.bin"),  emit: SBayes_LD
+    tuple val(cohort), path ("*"),  emit: SBayes
     
     
     script:
     """
     
-    R_GWAS_QC_SBayes.R ${cohort} ${GWAS_QC_noclump}  ${private_input_files_path} 
+    R_GWAS_QC_SBayes.R ${cohort} ${cohort_LD} ${GWAS_QC_noclump_cojo} ${SBayesRC_annot} ${SBayesRC_annot_path} ${private_input_files_path} 
     
     """
 }
