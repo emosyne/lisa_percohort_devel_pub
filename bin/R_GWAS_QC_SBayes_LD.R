@@ -49,34 +49,36 @@ data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_n
 
 ##############################################
 # Code
-# Step1: generate the LD block information and script
+print("Step1: generate the LD block information and script")
 # Output $outDir/ldm.info, $outDir/ld.sh, $outDir/snplist/*.snplist
 SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), 
                   genoPrefix=LDfile_path,
                   outDir=paste0(cohort,'_LD'), genoCHR='', 
                   blockRef='', log2file=F)
 
-# Step2: generate each LD matrix for blocks
+print("Step2: generate each LD matrix for blocks")
 #  Loop idx from 1 to NUM_BLOCK (591)
 #  Submit multiple jobs on your cluster / clouds instead of for loop
 #  Input depends on $outDir/ld.sh, $outDir/snplist/$idx.snplist
 #  Ouput $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
 for(idx in (1:591)) {
+    print(paste("Step2 loop", idx))
     SBayesRC::LDstep2(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
 }
 
 
-# Step3: eigen decomposition for each LD block
+print("Step3: eigen decomposition for each LD block")
 #  Loop idx from 1 to NUM_BLOCK (591)
 #  Submit multiple jobs on your cluster / clouds instead of for loop
 #  Input depends on $outDir/ldm.info, $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
 #  Output $outDir/block$block.eigen.bin, $outDir/block$block.eigen.bin.log
 # export OMP_NUM_THREADS=$threads  # parallel computing supported in this step
 for(idx in (1:591)) {
+    print(paste("Step3 loop", idx))
     SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
 }
 
-# Step4: merge LD information
+print("Step4: merge LD information")
 SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=F)
 
 # Step5: clean if necessary
@@ -86,25 +88,25 @@ SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=F)
 
 
 
-# Tidy: optional step, tidy summary data
-## "log2file=TRUE" means the messages will be redirected to a log file 
+# print("Tidy: optional step, tidy summary data")
+# ## "log2file=TRUE" means the messages will be redirected to a log file 
 
 
-SBayesRC::tidy(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), LDdir=paste0(cohort,'_LD'), 
-               output=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=TRUE)
-
-
-
-## Best practice: read the log to check issues in your GWAS summary data.  
-
-# Impute: optional step if your summary data doesn't cover the SNP panel
-
-SBayesRC::impute(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=paste0(cohort,'_LD'), 
-                 output=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=TRUE)
+# SBayesRC::tidy(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), LDdir=paste0(cohort,'_LD'), 
+#                output=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=TRUE)
 
 
 
-# SBayesRC::sbayesrc(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=LDdir, 
-#                   outPrefix=paste0(cohort,'_',SBayesRC_annot,'_sbrc'),
-#                   annot=SBayesRC_annot_path, 
-#                   log2file=TRUE)
+# ## Best practice: read the log to check issues in your GWAS summary data.  
+
+# # Impute: optional step if your summary data doesn't cover the SNP panel
+
+# SBayesRC::impute(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=paste0(cohort,'_LD'), 
+#                  output=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=TRUE)
+
+
+
+# # SBayesRC::sbayesrc(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=LDdir, 
+# #                   outPrefix=paste0(cohort,'_',SBayesRC_annot,'_sbrc'),
+# #                   annot=SBayesRC_annot_path, 
+# #                   log2file=TRUE)
