@@ -4,7 +4,7 @@ process R_GWAS_QC_SBayes_LD {
     label 'process_high'
     tag "$cohort"
     cache "lenient"
-    clusterOptions "--partition=himem_4tb"
+    // clusterOptions "--partition=himem_4tb"
 
 
     input: 
