@@ -102,7 +102,7 @@ workflow lisa_percohort_devel {
         bash_base_GWAS_QC.out.GWAS_QC_noclump
             .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
     )
-    
+
     R_GWAS_QC_SBayes_LD.out.SBayes_LD
             .combine(SBayesRC_annot_files)
             .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
@@ -113,6 +113,7 @@ workflow lisa_percohort_devel {
     //         // .combine(SBayesRC_annot_files)
     //         .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
     // )
+
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
     // PLINK2_QC_PRUNE_HET (
