@@ -17,8 +17,7 @@ process R_GWAS_QC_SBayes_LD {
 
     output:
     // $outDir/ldm.info, $outDir/snp.info, $outDir/block*.eigen.bin 
-    tuple val(cohort), path ("${cohort}_LD/ldm.info"), path ("${cohort}_LD/snp.info"), \
-        path ("${cohort}_LD/block*.eigen.bin"), path("${cohort}_LOO_GWAS_QC_noclump.cojo"), emit: SBayes_LD
+    tuple val(cohort), path ("${cohort}_LD/*"), path("${cohort}_LOO_GWAS_QC_noclump.cojo"), emit: SBayes_LD
     
     
     script:

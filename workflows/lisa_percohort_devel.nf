@@ -100,15 +100,13 @@ workflow lisa_percohort_devel {
 
     R_GWAS_QC_SBayes_LD(
         bash_base_GWAS_QC.out.GWAS_QC_noclump
-            // .combine(SBayesRC_annot_files)
             .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
     )
-    R_GWAS_QC_SBayes_LD.out.SBayes_LD.view()
-
-    bash_base_GWAS_QC.out.GWAS_QC_noclump
+    
+    R_GWAS_QC_SBayes_LD.out.SBayes_LD
             .combine(SBayesRC_annot_files)
             .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
-            .join(R_GWAS_QC_SBayes_LD.out.SBayes_LD).view()
+            .view()
     
     // R_GWAS_QC_SBayes(
     //     bash_base_GWAS_QC.out.GWAS_QC_noclump
