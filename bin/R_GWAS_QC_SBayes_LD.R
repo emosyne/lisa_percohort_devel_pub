@@ -21,7 +21,7 @@ private_input_files_path = args[10]
 # SBayesRC_annot_path = args[12]
 
 LDdir       <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/")
-LDfile_path <- paste0(private_input_files_path, "/LD_ref/1000g_phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes_EUR_annot_GRCh37")
+(LDfile_path <- paste0(private_input_files_path, "/LD_ref/1000g_phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes_EUR_annot_GRCh37"))
 
 
 #current GWAS format:

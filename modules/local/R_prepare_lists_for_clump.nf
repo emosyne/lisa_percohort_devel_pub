@@ -1,6 +1,6 @@
 process R_prepare_lists_for_clump {
     // debug true
-    container 'emosyne/r_docker:2.0'
+    container 'emosyne/r_docker:2.01'
     // container 'emosyne/simpler:1.1'
     label 'process_high'
     tag "${cohort}_${ENH_list}"
