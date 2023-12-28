@@ -76,6 +76,7 @@ print("Step3: eigen decomposition for each LD block")
 for(idx in (1:591)) {
     print(paste("Step3 loop", idx))
     SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
+    gc() #free memory
 }
 
 print("Step4: merge LD information")
