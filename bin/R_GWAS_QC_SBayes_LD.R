@@ -55,6 +55,7 @@ SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"),
                   genoPrefix=LDfile_path,
                   outDir=paste0(cohort,'_LD'), genoCHR='', 
                   blockRef=refblocks_GRCh37, log2file=F)
+gc() #free memory
 
 print("Step2: generate each LD matrix for blocks")
 #  Loop idx from 1 to NUM_BLOCK (591)
@@ -64,8 +65,9 @@ print("Step2: generate each LD matrix for blocks")
 for(idx in (1:591)) {
     print(paste("Step2 loop", idx))
     SBayesRC::LDstep2(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
+    gc() #free memory
 }
-
+gc() #free memory
 
 print("Step3: eigen decomposition for each LD block")
 #  Loop idx from 1 to NUM_BLOCK (591)
@@ -78,6 +80,7 @@ for(idx in (1:591)) {
     SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
     gc() #free memory
 }
+gc() #free memory
 
 print("Step4: merge LD information")
 SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=F)
