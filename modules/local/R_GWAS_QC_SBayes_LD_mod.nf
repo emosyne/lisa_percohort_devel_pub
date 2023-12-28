@@ -4,7 +4,7 @@ process R_GWAS_QC_SBayes_LD {
     label 'process_high_memory_genoa'
     tag "$cohort"
     cache "lenient"
-    clusterOptions "--partition=genoa"
+    // clusterOptions "--partition=genoa"
 
 
     input: 
