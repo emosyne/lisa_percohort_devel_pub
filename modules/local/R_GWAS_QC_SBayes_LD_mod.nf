@@ -1,10 +1,10 @@
 process R_GWAS_QC_SBayes_LD {
     // debug true
     container 'emosyne/r_docker:2.01'
-    label 'process_high'
+    label 'process_high_memory_genoa'
     tag "$cohort"
     cache "lenient"
-    // clusterOptions "--partition=himem_4tb"
+    clusterOptions "--partition=genoa"
 
 
     input: 
