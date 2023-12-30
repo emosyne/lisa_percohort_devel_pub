@@ -21,7 +21,6 @@ private_input_files_path = args[10]
 # SBayesRC_annot_path = args[12]
 
 LDdir       <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/")
-(LDfile_path <- paste0(private_input_files_path, "/LD_ref/1000g_phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes_EUR_annot_GRCh37"))
 refblocks_GRCh37 <- paste0(private_input_files_path, "/SBayes_annots/refblocks_GRCh37.txt")
 
 #current GWAS format:
@@ -48,12 +47,14 @@ data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_n
 
 
 ##############################################
+(LDfile_path <- paste0(private_input_files_path, "/LD_ref/1000g_phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes_EUR_annot_GRCh37_{CHR}"))
+
 # Code
 print("Step1: generate the LD block information and script")
 # Output $outDir/ldm.info, $outDir/ld.sh, $outDir/snplist/*.snplist
 SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), 
                   genoPrefix=LDfile_path,
-                  outDir=paste0(cohort,'_LD'), genoCHR='', 
+                  outDir=paste0(cohort,'_LD'), genoCHR='1-23', 
                   blockRef=refblocks_GRCh37, log2file=F)
 gc() #free memory
 
