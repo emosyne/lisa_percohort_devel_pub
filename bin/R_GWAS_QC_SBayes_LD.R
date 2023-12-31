@@ -71,12 +71,16 @@ for(idx in (1:591)) {
 gc() #free memory
 
 print("Step3: eigen decomposition for each LD block")
+#obtain block ids from actual files:
+list = list.files(paste0(cohort,'_LD'))
+ids = readr::parse_number(list)
+
 #  Loop idx from 1 to NUM_BLOCK (591)
 #  Submit multiple jobs on your cluster / clouds instead of for loop
 #  Input depends on $outDir/ldm.info, $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
 #  Output $outDir/block$block.eigen.bin, $outDir/block$block.eigen.bin.log
 # export OMP_NUM_THREADS=$threads  # parallel computing supported in this step
-for(idx in (1:591)) {
+for(idx in ids) {
     print(paste("Step3 loop", idx))
     SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=T)
     gc() #free memory
