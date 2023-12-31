@@ -70,11 +70,12 @@ for(idx in (1:591)) {
 }
 gc() #free memory
 
-print("Step3: eigen decomposition for each LD block")
-#obtain block ids from actual files:
+print("obtain block ids from actual files:")
 list = list.files(paste0(cohort,'_LD'))
-ids = readr::parse_number(list)
+(ids = unique(readr::parse_number(list)))
 
+
+print("Step3: eigen decomposition for each LD block")
 #  Loop idx from 1 to NUM_BLOCK (591)
 #  Submit multiple jobs on your cluster / clouds instead of for loop
 #  Input depends on $outDir/ldm.info, $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
