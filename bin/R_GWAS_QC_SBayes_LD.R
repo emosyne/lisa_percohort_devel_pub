@@ -55,7 +55,7 @@ print("Step1: generate the LD block information and script")
 SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), 
                   genoPrefix=LDfile_path,
                   outDir=paste0(cohort,'_LD'), genoCHR='1-23', 
-                  blockRef=refblocks_GRCh37, log2file=F)
+                  blockRef=refblocks_GRCh37, log2file=T)
 gc() #free memory
 
 print("Step2: generate each LD matrix for blocks")
@@ -65,7 +65,7 @@ print("Step2: generate each LD matrix for blocks")
 #  Ouput $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
 for(idx in (1:591)) {
     print(paste("Step2 loop", idx))
-    SBayesRC::LDstep2(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
+    SBayesRC::LDstep2(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=T)
     gc() #free memory
 }
 gc() #free memory
@@ -78,13 +78,13 @@ print("Step3: eigen decomposition for each LD block")
 # export OMP_NUM_THREADS=$threads  # parallel computing supported in this step
 for(idx in (1:591)) {
     print(paste("Step3 loop", idx))
-    SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=F)
+    SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=T)
     gc() #free memory
 }
 gc() #free memory
 
 print("Step4: merge LD information")
-SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=F)
+SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=T)
 
 # Step5: clean if necessary
 # Essential for analysis: $outDir/ldm.info, $outDir/snp.info, $outDir/block*.eigen.bin 
@@ -96,16 +96,16 @@ SBayesRC::LDstep4(outDir=paste0(cohort,'_LD'), log2file=F)
 print("Tidy: optional step, tidy summary data")
 ## "log2file=TRUE" means the messages will be redirected to a log file 
 SBayesRC::tidy(mafile=GWAS_QC_noclump_cojo, LDdir=cohort_LD_path,
-               output=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=F)
+               output=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=T)
 
 
 
 ## Best practice: read the log to check issues in your GWAS summary data.  
 print("Impute: optional step if your summary data doesn't cover the SNP panel")
 SBayesRC::impute(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=cohort_LD_path,
-                 output=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=F)
+                 output=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=T)
 
 
 print("SBayesRC: main function for SBayesRC  without annotation (for comparison)")
 SBayesRC::sbayesrc(mafile=paste0(cohort,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                 outPrefix=paste0(cohort,'_',SBayesRC_annot,'_sbrc_noAnnot'), log2file=F)
+                 outPrefix=paste0(cohort,'_',SBayesRC_annot,'_sbrc_noAnnot'), log2file=T)
