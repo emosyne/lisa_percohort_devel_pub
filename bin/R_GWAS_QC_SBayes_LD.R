@@ -71,8 +71,9 @@ for(idx in (1:591)) {
 gc() #free memory
 
 print("obtain block ids from actual files:")
-list = list.files(paste0(cohort,'_LD'))
-(ids = unique(readr::parse_number(list)))
+list <- list.files(paste0(cohort,'_LD'))
+list <- grep('.ldm.full.info', list, value = TRUE)
+(ids_list <- unique(readr::parse_number(list)))
 
 
 print("Step3: eigen decomposition for each LD block")
@@ -81,7 +82,7 @@ print("Step3: eigen decomposition for each LD block")
 #  Input depends on $outDir/ldm.info, $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
 #  Output $outDir/block$block.eigen.bin, $outDir/block$block.eigen.bin.log
 # export OMP_NUM_THREADS=$threads  # parallel computing supported in this step
-for(idx in ids) {
+for(idx in ids_list) {
     print(paste("Step3 loop", idx))
     SBayesRC::LDstep3(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=T)
     gc() #free memory
