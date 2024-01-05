@@ -18,7 +18,7 @@ print(args)
 LOO_GWAS_QC_noclump = fread(args[9], select=c("CHR", "SNP", "BP", "A1", "A2", "FRQ_A_51419", "FRQ_U_74993", "OR", "SE", "P", "Nca", "Nco"))
 private_input_files_path = args[10]
 refblocks_GRCh37 = args[11]
-# SBayesRC_annot_path = args[12]
+
 
 LDdir       <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/")
 
