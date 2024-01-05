@@ -101,6 +101,7 @@ workflow lisa_percohort_devel {
     R_GWAS_QC_SBayes_LD(
         bash_base_GWAS_QC.out.GWAS_QC_noclump
             .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
+            .combine(Channel.fromPath( './input/refblocks_GRCh37_noblock89-117_renameblocks.txt' ))
     )
 
     R_GWAS_QC_SBayes_LD.out.SBayes_LD
