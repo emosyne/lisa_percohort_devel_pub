@@ -64,13 +64,13 @@ SBayesRC_annot_files =
         "annot_baseline2_2_with_continuous_enhancers"
         )
         .map { SBayesRC_annot -> ["${SBayesRC_annot}", 
-            file("/home/osimoe/private_input_files/SBayes_annots/${SBayesRC_annot}.txt.gz", checkIfExists: true)]
+            file("/home/osimoe/emanuele_project/private_input_files/SBayes_annots/${SBayesRC_annot}.txt.gz", checkIfExists: true)]
             } 
 
 
 //LD ref
 LD_reference_GRCh37 = Channel.from("bed","bim","fam") 
-    .map { ext -> [file("/home/osimoe/private_input_files/LD_ref/1000g_phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes_EUR_annot_GRCh37.${ext}")] }
+    .map { ext -> [file("/home/osimoe/emanuele_project/private_input_files/LD_ref/1000g_phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes_EUR_annot_GRCh37.${ext}")] }
             .collect()
 
 
@@ -94,24 +94,24 @@ workflow lisa_percohort_devel {
 
     // bash_base_GWAS_QC.out.GWAS_QC_noclump
     //     .combine(SBayesRC_annot_files)
-    //     .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+    //     .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
     //     .view()
-    // //     [xs234, /gpfs/home2/osimoe/.nextflow/assets/emosyne/lisa_percohort_devel_pub/work/a4/b9989df138ae1893b5033a3b5a8e66/xs234_GWAS_QC_noclump.gz, annot_baseline2_2_with_continuous_enhancers, /home/osimoe/private_input_files/SBayes_annots/annot_baseline2_2_with_continuous_enhancers.txt.gz, /home/osimoe/private_input_files]
+    // //     [xs234, /gpfs/home2/osimoe/.nextflow/assets/emosyne/lisa_percohort_devel_pub/work/a4/b9989df138ae1893b5033a3b5a8e66/xs234_GWAS_QC_noclump.gz, annot_baseline2_2_with_continuous_enhancers, /home/osimoe/emanuele_project/private_input_files/SBayes_annots/annot_baseline2_2_with_continuous_enhancers.txt.gz, /home/osimoe/emanuele_project/private_input_files]
 
     R_GWAS_QC_SBayes_LD(
         bash_base_GWAS_QC.out.GWAS_QC_noclump
-            .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+            .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
     )
 
     R_GWAS_QC_SBayes_LD.out.SBayes_LD
             .combine(SBayesRC_annot_files)
-            .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+            .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
             .view()
     
     // R_GWAS_QC_SBayes(
     //     bash_base_GWAS_QC.out.GWAS_QC_noclump
     //         // .combine(SBayesRC_annot_files)
-    //         .combine(Channel.fromPath( '/home/osimoe/private_input_files/', type: 'dir' ))
+    //         .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
     // )
 
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
@@ -189,7 +189,7 @@ workflow lisa_percohort_devel {
     //     // ##################################################### GENERATE MODIFIED ORS MULT BY ES OR EXP       ###########################################################
     //     // output separate lists to calculate split PRSs and also merged one
     //     PLINK_clump.out.clumped_SNPs_and_noclump_lists.map { [it, "1"].flatten() }, //######################## multiplier can be set here ########################
-    //     Channel.fromPath( "/home/osimoe/private_input_files/ES_multipliers/2023-01-18_NEURAL_ENH_EXP_significant_ES_significant_contact_EPs_gene_brain_exp_plus_100_noOverlap.csv.gz", checkIfExists: true)
+    //     Channel.fromPath( "/home/osimoe/emanuele_project/private_input_files/ES_multipliers/2023-01-18_NEURAL_ENH_EXP_significant_ES_significant_contact_EPs_gene_brain_exp_plus_100_noOverlap.csv.gz", checkIfExists: true)
     // )
 
 

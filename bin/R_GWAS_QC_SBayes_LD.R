@@ -21,7 +21,7 @@ private_input_files_path = args[10]
 # SBayesRC_annot_path = args[12]
 
 LDdir       <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/")
-refblocks_GRCh37 <- paste0(private_input_files_path, "/SBayes_annots/refblocks_GRCh37.txt")
+refblocks_GRCh37_noblock89 <- paste0(private_input_files_path, "/SBayes_annots/refblocks_GRCh37_noblock89.txt")
 
 #current GWAS format:
 # (/gpfs/home2/osimoe/nf) [osimoe@int6 lisa_percohort_devel_pub]$ zcat  /gpfs/home2/osimoe/.nextflow/assets/emosyne/lisa_percohort_devel_pub/work/a4/b9989df138ae1893b5033a3b5a8e66/xs234_GWAS_QC_noclump.gz | head | column -t
@@ -55,7 +55,7 @@ print("Step1: generate the LD block information and script")
 SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), 
                   genoPrefix=LDfile_path,
                   outDir=paste0(cohort,'_LD'), genoCHR='1-23', 
-                  blockRef=refblocks_GRCh37, log2file=T)
+                  blockRef=refblocks_GRCh37_noblock89, log2file=T)
 gc() #free memory
 
 print("Step2: generate each LD matrix for blocks")
