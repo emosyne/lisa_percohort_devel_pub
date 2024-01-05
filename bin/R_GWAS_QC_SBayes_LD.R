@@ -59,11 +59,11 @@ SBayesRC::LDstep1(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"),
 gc() #free memory
 
 print("Step2: generate each LD matrix for blocks")
-#  Loop idx from 1 to NUM_BLOCK (591)
+#  Loop idx from 1 to NUM_BLOCK (589)
 #  Submit multiple jobs on your cluster / clouds instead of for loop
 #  Input depends on $outDir/ld.sh, $outDir/snplist/$idx.snplist
 #  Ouput $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
-for(idx in (1:591)) {
+for(idx in (1:589)) {
     print(paste("Step2 loop", idx))
     SBayesRC::LDstep2(outDir=paste0(cohort,'_LD'), blockIndex=idx, log2file=T)
     gc() #free memory
@@ -77,7 +77,7 @@ list <- grep('.ldm.full.info', list, value = TRUE)
 
 
 print("Step3: eigen decomposition for each LD block")
-#  Loop idx from 1 to NUM_BLOCK (591)
+#  Loop idx from 1 to NUM_BLOCK (589)
 #  Submit multiple jobs on your cluster / clouds instead of for loop
 #  Input depends on $outDir/ldm.info, $outDir/b$idx.ldm.full.info, $outDir/b$idx.ldm.full.bin
 #  Output $outDir/block$block.eigen.bin, $outDir/block$block.eigen.bin.log
