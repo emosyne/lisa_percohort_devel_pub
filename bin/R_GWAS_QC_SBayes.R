@@ -44,7 +44,7 @@ data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_n
 
 
 
-##############################################
+## pipeline using UKBB-LD ##############################################
 
 
 (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/"))
@@ -75,7 +75,7 @@ SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir
                   log2file=F)
 
 
-##############################################
+## pipeline using PGC_xs234_LD ##############################################
 
 
 (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/PGC_xs234_LD/"))
@@ -83,7 +83,7 @@ SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir
 
 print("Tidy: optional step, tidy summary data")
 ## "log2file=TRUE" means the messages will be redirected to a log file 
-SBayesRC::tidy(mafile=LOO_GWAS_QC_noclump, LDdir=cohort_LD_path,
+SBayesRC::tidy(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), LDdir=cohort_LD_path,
                output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=T)
 
 
@@ -95,8 +95,6 @@ SBayesRC::impute(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=
 
 
 
-##############################
-(cohort_LD          <- paste0(cohort,'_UKBB-LD'))
 
 print("SBayesRC: main function for SBayesRC  without annotation (for comparison)")
 SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
