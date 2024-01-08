@@ -99,20 +99,16 @@ workflow lisa_percohort_devel {
     //         .combine(Channel.fromPath( './input/refblocks_GRCh37_noblock89-117_renameblocks.txt' ))
     // )
 
-    bash_base_GWAS_QC.out.GWAS_QC_noclump
+
+    
+    R_GWAS_QC_SBayes(
+        bash_base_GWAS_QC.out.GWAS_QC_noclump
             .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
             .combine(SBayesRC_annot_files)
-            .view()
- 
-    
-    // R_GWAS_QC_SBayes(
-    //     bash_base_GWAS_QC.out.GWAS_QC_noclump
-    //         .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
-    //         .combine(SBayesRC_annot_files)
-    // )
+    )
 
-    // R_GWAS_QC_SBayes.out.SBayes
-    //     .view()
+    R_GWAS_QC_SBayes.out.SBayes
+        .view()
 
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
