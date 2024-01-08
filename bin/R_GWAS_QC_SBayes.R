@@ -17,6 +17,8 @@ print(args)
 (cohort = args[8])
 GWAS_QC_noclump = fread(args[9])
 private_input_files_path = args[10]
+SBayesRC_annot = args[11]
+SBayesRC_annot_path = args[12]
 
 
 #current GWAS format:
@@ -68,7 +70,7 @@ SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir
 
 print("SBayesRC: main function for SBayesRC")
 SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                  outPrefix=paste0(cohort_LD,'_sbrc'),
+                  outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc'),
                   annot=SBayesRC_annot_path, 
                   log2file=F)
 
@@ -102,6 +104,6 @@ SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir
 
 print("SBayesRC: main function for SBayesRC")
 SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                  outPrefix=paste0(cohort_LD,'_sbrc'),
+                  outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc'),
                   annot=SBayesRC_annot_path, 
                   log2file=F)
