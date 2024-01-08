@@ -57,7 +57,7 @@ enhancer_lists_bed_files =
 
 SBayesRC_annot_files = 
     Channel.from(
-        "annot_baseline2.2", 
+        // "annot_baseline2.2", 
         // "annot_binary_enhancers_only",
         // "annot_baseline2_2_with_binary_enhancers",
         // "annot_continuous_enhancers_only",
