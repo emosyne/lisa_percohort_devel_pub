@@ -45,14 +45,12 @@ data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_n
 ##############################################
 
 
-head(LOO_GWAS_QC_noclump)
-
 (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/"))
 (cohort_LD = paste0(cohort,'_UKBB-LD'))
   
 print("Tidy: optional step, tidy summary data")
 ## "log2file=TRUE" means the messages will be redirected to a log file 
-SBayesRC::tidy(mafile=LOO_GWAS_QC_noclump, LDdir=cohort_LD_path,
+SBayesRC::tidy(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), LDdir=cohort_LD_path,
                output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=T)
 
 
