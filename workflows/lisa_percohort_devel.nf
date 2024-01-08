@@ -98,22 +98,22 @@ workflow lisa_percohort_devel {
     //     .view()
     // //     [xs234, /gpfs/home2/osimoe/.nextflow/assets/emosyne/lisa_percohort_devel_pub/work/a4/b9989df138ae1893b5033a3b5a8e66/xs234_GWAS_QC_noclump.gz, annot_baseline2_2_with_continuous_enhancers, /home/osimoe/emanuele_project/private_input_files/SBayes_annots/annot_baseline2_2_with_continuous_enhancers.txt.gz, /home/osimoe/emanuele_project/private_input_files]
 
-    R_GWAS_QC_SBayes_LD(
+    // GENERATE LOCAL SNP-BASED LD 
+    // R_GWAS_QC_SBayes_LD(
+    //     bash_base_GWAS_QC.out.GWAS_QC_noclump
+    //         .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
+    //         .combine(Channel.fromPath( './input/refblocks_GRCh37_noblock89-117_renameblocks.txt' ))
+    // )
+
+ 
+    
+    R_GWAS_QC_SBayes(
         bash_base_GWAS_QC.out.GWAS_QC_noclump
             .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
-            .combine(Channel.fromPath( './input/refblocks_GRCh37_noblock89-117_renameblocks.txt' ))
     )
 
-    R_GWAS_QC_SBayes_LD.out.SBayes_LD
-            .combine(SBayesRC_annot_files)
-            .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
-            .view()
-    
-    // R_GWAS_QC_SBayes(
-    //     bash_base_GWAS_QC.out.GWAS_QC_noclump
-    //         // .combine(SBayesRC_annot_files)
-    //         .combine(Channel.fromPath( '/home/osimoe/emanuele_project/private_input_files/', type: 'dir' ))
-    // )
+    R_GWAS_QC_SBayes.out.SBayes
+        .view()
 
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
