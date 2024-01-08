@@ -46,7 +46,7 @@ data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_n
 
 
 (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/"))
-(cohort_LD = paste0(cohort,'_UKBB-LD'))
+(cohort_LD          <- paste0(cohort,'_UKBB-LD'))
   
 print("Tidy: optional step, tidy summary data")
 ## "log2file=TRUE" means the messages will be redirected to a log file 
@@ -61,15 +61,20 @@ SBayesRC::impute(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=
                  output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=T)
 
 
+
 print("SBayesRC: main function for SBayesRC  without annotation (for comparison)")
 SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                 outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc_noAnnot'), log2file=T)
+                 outPrefix=paste0(cohort_LD,'_sbrc_noAnnot'), log2file=T)
 
 print("SBayesRC: main function for SBayesRC")
 SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                  outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc'),
+                  outPrefix=paste0(cohort_LD,'_sbrc'),
                   annot=SBayesRC_annot_path, 
                   log2file=F)
+
+
+##############################################
+
 
 (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/PGC_xs234_LD/"))
 (cohort_LD = paste0(cohort,'_PGC_xs234_LD'))
@@ -87,12 +92,16 @@ SBayesRC::impute(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=
                  output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=T)
 
 
+
+##############################
+(cohort_LD          <- paste0(cohort,'_UKBB-LD'))
+
 print("SBayesRC: main function for SBayesRC  without annotation (for comparison)")
 SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                 outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc_noAnnot'), log2file=T)
+                 outPrefix=paste0(cohort_LD,'_sbrc_noAnnot'), log2file=T)
 
 print("SBayesRC: main function for SBayesRC")
 SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                  outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc'),
+                  outPrefix=paste0(cohort_LD,'_sbrc'),
                   annot=SBayesRC_annot_path, 
                   log2file=F)
