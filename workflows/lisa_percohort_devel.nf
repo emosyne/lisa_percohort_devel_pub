@@ -110,17 +110,15 @@ workflow lisa_percohort_devel {
     )
 
         
+    bash_SBayes_plink_PRS (
+        R_GWAS_QC_SBayes.out.SBayes_annots 
+            .join(validation_samples)
+    )
+
     // //also take just one of the non-annots
-    // bash_SBayes_plink_PRS (
-    //     R_GWAS_QC_SBayes.out.SBayes_annots 
-    //         .join(validation_samples)
-    // )
-
-    R_GWAS_QC_SBayes.out.SBayes_NOannots 
+    R_GWAS_QC_SBayes.out.SBayes_NOannots.first()
         .join(validation_samples)
-        .combine(Channel.fromPath( './input/range_list'))
         .view()
-
     // bash_SBayes_plink_PRS_noannot (
     //     R_GWAS_QC_SBayes.out.SBayes_NOannots 
     //         .join(validation_samples)
