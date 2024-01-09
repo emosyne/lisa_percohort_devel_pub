@@ -7,7 +7,7 @@ process bash_SBayes_plink_PRS_noannot {
 
     input: 
     // [xs234, annot_baseline2_2_with_continuous_enhancers, /gpfs/home2/osimoe/emanuele_project/lisa_percohort_devel_pub_work_dir/35/81d5d3fa127d41d0b17a3c96d0b9fb/xs234_UKBB-LD_sbrc_noAnnot.txt, /gpfs/work5/0/pgcdac/DWFV2CJb8Piv_0116_pgc_data/scz/wave3/v1/xs234, /gpfs/home2/osimoe/.nextflow/assets/emosyne/lisa_percohort_devel_pub/input/range_list]
-    tuple val(cohort), val(SBayesRC_annot), path(sbrc_PRS), path(cohort_dir), path(range_list)
+    tuple val(cohort), val(SBayesRC_annot), path(sbrc_PRS), path(cohort_dir)
     
 
     output:
