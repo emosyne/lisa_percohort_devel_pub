@@ -75,33 +75,33 @@ SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir
                   log2file=F)
 
 
-## pipeline using PGC_xs234_LD ##############################################
-# 1.394.135 SNPs in common between GWAS summary and LD
+# ## pipeline using PGC_xs234_LD ##############################################
+# # 1.394.135 SNPs in common between GWAS summary and LD
 
-(cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/PGC_xs234_LD/"))
-(cohort_LD = paste0(cohort,'_PGC_xs234_LD'))
+# (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/PGC_xs234_LD/"))
+# (cohort_LD = paste0(cohort,'_PGC_xs234_LD'))
 
-print("Tidy: optional step, tidy summary data")
-## "log2file=TRUE" means the messages will be redirected to a log file 
-SBayesRC::tidy(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), LDdir=cohort_LD_path,
-               output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=T)
-
-
-
-## Best practice: read the log to check issues in your GWAS summary data.  
-print("Impute: optional step if your summary data doesn't cover the SNP panel")
-SBayesRC::impute(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=cohort_LD_path,
-                 output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=T)
+# print("Tidy: optional step, tidy summary data")
+# ## "log2file=TRUE" means the messages will be redirected to a log file 
+# SBayesRC::tidy(mafile=paste0(cohort,"_LOO_GWAS_QC_noclump.cojo"), LDdir=cohort_LD_path,
+#                output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), log2file=T)
 
 
 
+# ## Best practice: read the log to check issues in your GWAS summary data.  
+# print("Impute: optional step if your summary data doesn't cover the SNP panel")
+# SBayesRC::impute(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_tidy.ma'), LDdir=cohort_LD_path,
+#                  output=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), log2file=T)
 
-print("SBayesRC: main function for SBayesRC  without annotation (for comparison)")
-SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                 outPrefix=paste0(cohort_LD,'_sbrc_noAnnot'), log2file=T)
 
-print("SBayesRC: main function for SBayesRC")
-SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
-                  outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc'),
-                  annot=SBayesRC_annot_path, 
-                  log2file=F)
+
+
+# print("SBayesRC: main function for SBayesRC  without annotation (for comparison)")
+# SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
+#                  outPrefix=paste0(cohort_LD,'_sbrc_noAnnot'), log2file=T)
+
+# print("SBayesRC: main function for SBayesRC")
+# SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir=cohort_LD_path,
+#                   outPrefix=paste0(cohort_LD,'_',SBayesRC_annot,'_sbrc'),
+#                   annot=SBayesRC_annot_path, 
+#                   log2file=F)
