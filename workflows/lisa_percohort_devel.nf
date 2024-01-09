@@ -1,14 +1,15 @@
 include { bash_base_GWAS_QC }           from '../modules/local/bash_base_GWAS_QC.nf'
 include { R_GWAS_QC_SBayes_LD }         from '../modules/local/R_GWAS_QC_SBayes_LD_mod.nf'
 include { R_GWAS_QC_SBayes }            from '../modules/local/R_GWAS_QC_SBayes_mod.nf'
+include { bash_SBayes_plink_PRS }       from '../modules/local/bash_SBayes_plink_PRS.nf'
 include { PLINK2_QC_PRUNE_HET }         from '../modules/local/PLINK2_QC_PRUNE_HET_mod.nf'
 include { R_PRS_QC }                    from '../modules/local/R_PRS_QC_mod.nf'
 include { PLINK_PRODUCE_QC_DATASET }    from '../modules/local/PLINK_PRODUCE_QC_DATASET_mod.nf'
 include { R_prepare_lists_for_clump }   from '../modules/local/R_prepare_lists_for_clump.nf'
-include {PLINK_clump}                   from '../modules/local/PLINK_clump_mod.nf'
-include {R_split_lists}                 from '../modules/local/R_split_lists.nf'
+include { PLINK_clump}                  from '../modules/local/PLINK_clump_mod.nf'
+include { R_split_lists}                from '../modules/local/R_split_lists.nf'
 include {PRSice_calculate_PRS_split_partitions} from '../modules/local/PRSice_calculate_PRS_split_partitions.nf'
-include {R_final_plot}                  from '../modules/local/R_final_plot.nf'
+include { R_final_plot}                 from '../modules/local/R_final_plot.nf'
 
 
 
@@ -108,6 +109,7 @@ workflow lisa_percohort_devel {
     )
 
     R_GWAS_QC_SBayes.out.SBayes
+        .join(validation_samples)
         .view()
 
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
