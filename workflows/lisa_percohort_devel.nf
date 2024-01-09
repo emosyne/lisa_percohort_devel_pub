@@ -109,22 +109,21 @@ workflow lisa_percohort_devel {
             .combine(SBayesRC_annot_files)
     )
 
-        
+    // calculate PRS for this validation target sample using SBayes scores for each annotation file
     bash_SBayes_plink_PRS (
         R_GWAS_QC_SBayes.out.SBayes_annots 
             .join(validation_samples)
     )
+    bash_SBayes_plink_PRS.out.SBayesRC_PRS.view()
 
-    // //also take just one of the non-annots
-    R_GWAS_QC_SBayes.out.SBayes_NOannots.first()
-        .join(validation_samples)
-        .view()
-    // bash_SBayes_plink_PRS_noannot (
-    //     R_GWAS_QC_SBayes.out.SBayes_NOannots 
-    //         .join(validation_samples)
-    // )
+    //also take just one of the non-annots
+    bash_SBayes_plink_PRS_noannot (
+        R_GWAS_QC_SBayes.out.SBayes_NOannots.first()
+            .join(validation_samples)
+    )
+    bash_SBayes_plink_PRS_noannot.out.SBayesRC_PRS.view()
+
     
-    // bash_SBayes_plink_PRS.out.SBayesRC_PRS.view()
 
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files

@@ -11,7 +11,7 @@ process bash_SBayes_plink_PRS_noannot {
     
 
     output:
-    tuple val(cohort), val(SBayesRC_annot), path ("*.profile"),                 emit: SBayesRC_PRS
+    tuple val(cohort), path ("*.profile"),                 emit: SBayesRC_PRS
 
     // path("*.log")
     
@@ -30,7 +30,7 @@ process bash_SBayes_plink_PRS_noannot {
     plink  \\
        --bfile \$bedfile2 \\
        --score ${sbrc_PRS} 1 2 3 header sum center \\
-       --out ${cohort}_${SBayesRC_annot}_SBayes_PRS \\
+       --out ${cohort}_NoAnnot_SBayes_PRS \\
        --threads $task.cpus \\
        --memory $mem_mb
     """
