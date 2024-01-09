@@ -108,7 +108,7 @@ workflow lisa_percohort_devel {
             .combine(SBayesRC_annot_files)
     )
 
-    R_GWAS_QC_SBayes.out.SBayes
+    R_GWAS_QC_SBayes.out.SBayes_annots
         .join(validation_samples)
         .view()
 

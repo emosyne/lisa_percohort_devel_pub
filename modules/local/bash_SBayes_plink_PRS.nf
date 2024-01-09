@@ -6,12 +6,12 @@ process bash_SBayes_plink_PRS {
     cache "lenient"
 
     input: 
-    tuple val(cohort), path(LOO_GWAS), path(cohort_dir), path(LD_ref_bed), path(LD_ref_bim), path(LD_ref_fam)
+    // [xs234, annot_baseline2_2_with_continuous_enhancers, xs234_UKBB-LD_annot_baseline2_2_with_continuous_enhancers_sbrc.txt, /gpfs/work5/0/pgcdac/DWFV2CJb8Piv_0116_pgc_data/scz/wave3/v1/xs234]
+    tuple val(cohort), val(SBayesRC_annot), path(sbrc_PRS), path(cohort_dir)
     
 
     output:
-    tuple val(cohort), path ("*_GWAS_QC_noclump.gz"),                 emit: GWAS_QC_noclump
-    tuple val(cohort), path ("*_GWAS_QC_clump.clumped"),                                emit: clumped_SNPs
+    tuple val(cohort), val(SBayesRC_annot), path ("*"),                 emit: out
 
     // path("*.log")
     
@@ -20,14 +20,16 @@ process bash_SBayes_plink_PRS {
     script:
     def mem_mb = (task.memory * 0.95).toMega()
     """ 
-    #remove SNPs with INFO < 0.8 and MAF < 0.01
-    zcat ${LOO_GWAS} | awk 'NR==1 || (\$6 < 0.99) && (\$8 > 0.8) {print}' | gzip > ${cohort}_GWAS_QC_noclump.gz
+    bedfile="${cohort_dir}/imputed/hardcall_genotypes/*.bed"
+    bimfile="${cohort_dir}/imputed/hardcall_genotypes/*.bim"
+    bedfile2=`echo \$bedfile | sed 's/.bed//'`
+    covariates="${cohort_dir}/prin_comp/*.mds"
+
+    echo \$bedfile2
 
     plink  \\
-       --clump ${cohort}_GWAS_QC_noclump.gz \\
-       --clump-p1 1 --clump-p2 1 \\
-       --clump-kb 500 --clump-r2 0.1 \\
-       --bfile ${LD_ref_bed.baseName} \\
+       --bfile \$bedfile2 \\
+       --score ${sbrc_PRS} 1 2 3 header sum center \\
        --out ${cohort}_GWAS_QC_clump  \\
        --threads $task.cpus \\
        --memory $mem_mb
