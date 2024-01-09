@@ -1,4 +1,4 @@
-process bash_SBayes_plink_PRS {
+process bash_SBayes_plink_PRS_noannot {
     tag "${cohort}_${SBayesRC_annot}"
     // debug true
     label 'process_high'

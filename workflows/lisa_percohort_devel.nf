@@ -2,6 +2,7 @@ include { bash_base_GWAS_QC }           from '../modules/local/bash_base_GWAS_QC
 include { R_GWAS_QC_SBayes_LD }         from '../modules/local/R_GWAS_QC_SBayes_LD_mod.nf'
 include { R_GWAS_QC_SBayes }            from '../modules/local/R_GWAS_QC_SBayes_mod.nf'
 include { bash_SBayes_plink_PRS }       from '../modules/local/bash_SBayes_plink_PRS.nf'
+include { bash_SBayes_plink_PRS_noannot } from '../modules/local/bash_SBayes_plink_PRS_noannot.nf'
 include { PLINK2_QC_PRUNE_HET }         from '../modules/local/PLINK2_QC_PRUNE_HET_mod.nf'
 include { R_PRS_QC }                    from '../modules/local/R_PRS_QC_mod.nf'
 include { PLINK_PRODUCE_QC_DATASET }    from '../modules/local/PLINK_PRODUCE_QC_DATASET_mod.nf'
@@ -58,10 +59,10 @@ enhancer_lists_bed_files =
 
 SBayesRC_annot_files = 
     Channel.from(
-        // "annot_baseline2.2", 
-        // "annot_binary_enhancers_only",
-        // "annot_baseline2_2_with_binary_enhancers",
-        // "annot_continuous_enhancers_only",
+        "annot_baseline2.2", 
+        "annot_binary_enhancers_only",
+        "annot_baseline2_2_with_binary_enhancers",
+        "annot_continuous_enhancers_only",
         "annot_baseline2_2_with_continuous_enhancers"
         )
         .map { SBayesRC_annot -> ["${SBayesRC_annot}", 
@@ -108,18 +109,25 @@ workflow lisa_percohort_devel {
             .combine(SBayesRC_annot_files)
     )
 
-    R_GWAS_QC_SBayes.out.SBayes_annots 
-        .join(validation_samples)
-        .view()
         
-    //also take just one of the non-annots
-    bash_SBayes_plink_PRS (
-        R_GWAS_QC_SBayes.out.SBayes_annots 
-            .join(validation_samples)
-    )
+    // //also take just one of the non-annots
+    // bash_SBayes_plink_PRS (
+    //     R_GWAS_QC_SBayes.out.SBayes_annots 
+    //         .join(validation_samples)
+    // )
+
+    R_GWAS_QC_SBayes.out.SBayes_NOannots 
+        .join(validation_samples)
+        .combine(Channel.fromPath( './input/range_list'))
+        .view()
+
+    // bash_SBayes_plink_PRS_noannot (
+    //     R_GWAS_QC_SBayes.out.SBayes_NOannots 
+    //         .join(validation_samples)
+    // )
     
-    bash_SBayes_plink_PRS.out.out.view()
-    
+    bash_SBayes_plink_PRS.out.SBayesRC_PRS.view()
+
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
     // PLINK2_QC_PRUNE_HET (
