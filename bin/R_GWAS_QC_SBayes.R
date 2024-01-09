@@ -45,7 +45,7 @@ data.table::fwrite(x = LOO_GWAS_QC_noclump, file = paste0(cohort,"_LOO_GWAS_QC_n
 
 
 ## pipeline using UKBB-LD ##############################################
-
+# 1.135.332 SNPs in common between GWAS summary and LD
 
 (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/ukbEUR_HM3/"))
 (cohort_LD          <- paste0(cohort,'_UKBB-LD'))
@@ -76,7 +76,7 @@ SBayesRC::sbayesrc(mafile=paste0(cohort_LD,'_LOO_GWAS_QC_noclump_imp.ma'), LDdir
 
 
 ## pipeline using PGC_xs234_LD ##############################################
-
+# 1.394.135 SNPs in common between GWAS summary and LD
 
 (cohort_LD_path     <- paste0(private_input_files_path, "/LD_ref/PGC_xs234_LD/"))
 (cohort_LD = paste0(cohort,'_PGC_xs234_LD'))
