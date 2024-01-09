@@ -108,10 +108,18 @@ workflow lisa_percohort_devel {
             .combine(SBayesRC_annot_files)
     )
 
-    R_GWAS_QC_SBayes.out.SBayes_annots
+    R_GWAS_QC_SBayes.out.SBayes_annots 
         .join(validation_samples)
         .view()
-
+        
+    //also take just one of the non-annots
+    bash_SBayes_plink_PRS (
+        R_GWAS_QC_SBayes.out.SBayes_annots 
+            .join(validation_samples)
+    )
+    
+    bash_SBayes_plink_PRS.out.out.view()
+    
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
     // PLINK2_QC_PRUNE_HET (

@@ -1,5 +1,5 @@
 process bash_SBayes_plink_PRS {
-    tag "$cohort"
+    tag "${cohort}_${SBayesRC_annot}"
     // debug true
     label 'process_high'
     container 'emosyne/plink2:7.2_Alpha5.9'
@@ -30,7 +30,8 @@ process bash_SBayes_plink_PRS {
     plink  \\
        --bfile \$bedfile2 \\
        --score ${sbrc_PRS} 1 2 3 header sum center \\
-       --out ${cohort}_GWAS_QC_clump  \\
+       --covar \$covariates \\
+       --out ${cohort}_${SBayesRC_annot}_SBayes_PRS \\
        --threads $task.cpus \\
        --memory $mem_mb
     """
