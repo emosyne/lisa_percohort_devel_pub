@@ -126,7 +126,7 @@ workflow lisa_percohort_devel {
     //         .join(validation_samples)
     // )
     
-    bash_SBayes_plink_PRS.out.SBayesRC_PRS.view()
+    // bash_SBayes_plink_PRS.out.SBayesRC_PRS.view()
 
     // // TARGET QC 1: PRUNE AND HETEROZIGOSITY CALCULATIONS
     // // produce prune.in and het files
