@@ -31,8 +31,8 @@ SBayesRC_annot_path = args[12]
 ### Format GWAS in cojo
 # colnames(formatted.gwas) = c("SNP", "A1", "A2", "freq", "b", "se", "p", "N")
 LOO_GWAS_QC_noclump <- GWAS_QC_noclump %>%
-    rename_at(vars(starts_with("FRQ_A_")), "FRQ_A")%>%
-    rename_at(vars(starts_with("FRQ_U_")), "FRQ_U")%>%
+    rename_at(vars(starts_with("FRQ_A_")), funs(sub(pattern = "_\\d+", replacement = "", .))) %>%
+    rename_at(vars(starts_with("FRQ_U_")), funs(sub(pattern = "_\\d+", replacement = "", .))) %>%
     mutate(freq = (( FRQ_A * Nca) + (FRQ_U * Nco) ) /(Nca + Nco), FRQ_A = NULL, FRQ_U = NULL,
            N    = Nca + Nco, Nca = NULL, Nco = NULL,
            b    = log(OR), OR = NULL) %>%
