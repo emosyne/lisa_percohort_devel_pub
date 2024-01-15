@@ -16,7 +16,7 @@ include { R_final_plot}                 from '../modules/local/R_final_plot.nf'
 
 
 // INPUTS
-test_sample_list = ["xs234"]//"celso","clz2a",  #"xirwt","xgras","xjrsa","gawli","mcqul","xclm2","xclo3","gpc2a","xboco","xswe5","xswe6",
+test_sample_list = ["xs234","celso","clz2a"]//,  #"xirwt","xgras","xjrsa","gawli","mcqul","xclm2","xclo3","gpc2a","xboco","xswe5","xswe6",
 LOO_PGC_GWASES = 
     Channel.fromList( test_sample_list )
     .map{[it, file("/gpfs/work5/0/pgcdac/DWFV2CJb8Piv_0116_pgc_data/scz/wave3/summary_stats/autosomes/PRS/ancestry-specific/study_scores_deduped_eur/training/daner_PGC_SCZ_w3_76_0518d_eur.no${it}.gz")]}
@@ -60,9 +60,9 @@ enhancer_lists_bed_files =
 SBayesRC_annot_files = 
     Channel.from(
         "annot_baseline2.2", 
-        // "annot_binary_enhancers_only",
-        // "annot_baseline2_2_with_binary_enhancers",
-        // "annot_continuous_enhancers_only",
+        "annot_binary_enhancers_only",
+        "annot_baseline2_2_with_binary_enhancers",
+        "annot_continuous_enhancers_only",
         "annot_baseline2_2_with_continuous_enhancers"
         )
         .map { SBayesRC_annot -> ["${SBayesRC_annot}", 
@@ -228,16 +228,19 @@ workflow lisa_percohort_devel {
         combined_splitlists_bedfile_QCeddata_LDdata
     )
     
-    // // ########################################### CHANGE NAMES OF MULTIPLIERS ###########################################
-    // PRS_results = 
-    //     PRSice_calculate_PRS_split_partitions.out.clumped_TS_ENH_GWAS_compartment_PRS
-    //         .join(PRSice_calculate_PRS_split_partitions.out.clumped_residual_GWAS_compartment_PRS)
-    //         .join(PRSice_calculate_PRS_split_partitions.out.clumped_merged_GWAS_PRS)
-    //         .join(PRSice_calculate_PRS_split_partitions.out.clumped_original_LOO_GWAS_PRS)
-    //         .map { [it, "enh_ES", "enh_TS_tpm"].flatten() }
+    // ########################################### CHANGE NAMES OF MULTIPLIERS ###########################################
+    PRS_results = 
+        PRSice_calculate_PRS_split_partitions.out.clumped_TS_ENH_GWAS_compartment_PRS
+            .join(PRSice_calculate_PRS_split_partitions.out.clumped_residual_GWAS_compartment_PRS)
+            .join(PRSice_calculate_PRS_split_partitions.out.clumped_merged_GWAS_PRS)
+            .join(PRSice_calculate_PRS_split_partitions.out.clumped_original_LOO_GWAS_PRS)
+            .map { [it, "enh_ES", "enh_TS_tpm"].flatten() }
 
 
-    // // PRS_results.view()
+    PRS_results
+        .combine(bash_SBayes_plink_PRS_noannot.out.SBayesRC_PRS)
+        .combine(bash_SBayes_plink_PRS.out.SBayesRC_PRS)
+        .view()
 
     
     // R_final_plot (
