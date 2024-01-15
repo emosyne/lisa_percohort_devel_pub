@@ -4,7 +4,7 @@ process R_GWAS_QC_SBayes {
     label 'process_high_long'
     tag "${cohort}_${SBayesRC_annot}"
     cache "lenient"
-    
+    maxForks 5
 
 
     input: 
